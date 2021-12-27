@@ -84,7 +84,7 @@
                   :class="store.dir === 'rtl' ? 'text-left' : 'text-right'"
                   class="px-6 py-4 whitespace-nowrap text-sm font-medium"
                 >
-                  <a href="#" class="text-indigo-600 hover:text-indigo-900"
+                  <a @click="emitDetailsHandler(index)" class="text-indigo-600 hover:text-indigo-900 cursor-pointer"
                     >{{store.dir === 'rtl' ? 'جزییات' : 'Details'}}</a
                   >
                 </td>
@@ -101,4 +101,9 @@
 import { store } from "../store";
 
 const props = defineProps<{ headers: string[]; rows: any[] }>();
+const emits = defineEmits<{(e: 'emitDetails', value: number): void}>();
+
+const emitDetailsHandler = (index: number) => {
+  emits('emitDetails', index)
+}
 </script>

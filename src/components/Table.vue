@@ -101,7 +101,7 @@
 import { store } from "../store";
 
 const props = defineProps<{ headers: string[]; rows: any[] }>();
-const emits = defineEmits<{(e: 'emitDetails', value: number): void}>();
+const emits = defineEmits<{(e: 'emitDetails', index: number): void}>();
 
 const emitDetailsHandler = (index: number) => {
   emits('emitDetails', index)

@@ -73,5 +73,5 @@ import { store } from "../store";
 import {ref, reactive} from 'vue';
 
 const props = defineProps<{ rows: any[] }>();
-const headers = ref(['نام', 'تاریخ', 'مقدار'])
+const headers = ref(['تراکنش', 'تاریخ', 'مقدار'])
 </script>

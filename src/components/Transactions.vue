@@ -18,14 +18,7 @@
                       ? 'text-right text-sm'
                       : 'text-left text-xs'
                   "
-                  class="
-                    px-6
-                    py-3
-                    font-extrabold
-                    text-gray-500
-                    uppercase
-                    tracking-wider
-                  "
+                  class="px-6 py-3 font-extrabold text-gray-500 uppercase tracking-wider"
                 >
                   {{ header }}
                 </th>
@@ -38,14 +31,14 @@
               <tr v-for="(row, index) in props.rows" :key="index">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ row.name }}
-                      </div>
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ row.name }}
+                    </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">
-                    {{ row.date }}
+                    {{ row.created_at }}
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -55,9 +48,18 @@
                   :class="store.dir === 'rtl' ? 'text-left' : 'text-right'"
                   class="px-6 py-4 whitespace-nowrap text-sm font-medium"
                 >
-                  <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                    >{{store.dir === 'rtl' ? 'حذف' : 'Delete'}}</a
-                  >
+                  <a href="#" class="text-indigo-600 hover:text-indigo-900">{{
+                    store.dir === "rtl" ? "حذف" : "Delete"
+                  }}</a>
+                </td>
+              </tr>
+              <tr v-if="!props.rows.length">
+                <td class="text-center" colspan="4">
+                  {{
+                    store.dir === "ltr"
+                      ? "No Data Available"
+                      : "داده ای موجود نیست"
+                  }}
                 </td>
               </tr>
             </tbody>
@@ -70,8 +72,8 @@
 
 <script setup lang="ts">
 import { store } from "../store";
-import {ref, reactive} from 'vue';
+import { ref, reactive } from "vue";
 
 const props = defineProps<{ rows: any[] }>();
-const headers = ref(['تراکنش', 'تاریخ', 'مقدار'])
+const headers = ref(["تراکنش", "تاریخ", "مقدار"]);
 </script>

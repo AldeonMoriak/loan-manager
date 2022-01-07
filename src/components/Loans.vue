@@ -1,156 +1,85 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, watch, onMounted } from "vue";
 import Table from "./Table.vue";
 import Transactions from "./Transactions.vue";
 import { store } from "../store";
+import AddTransaction from "./AddTransaction.vue";
+import AddLoan from "./AddLoan.vue";
+import { allLoans, deleteLoan, fetchLoans } from "../vuetils/useLoans";
+import { Loan, Transaction } from "../helpers/interfaces";
 
 const showAddTransaction = ref(false);
+const showAddLoan = ref(false);
 
-const defaultTitle = store.dir === "rtl" ? "لیست وام ها" : "Loans List";
+const defaultTitle = { rtl: "لیست وام ها", ltr: "Loans List" };
+const defaultDetailsTitle = { rtl: "جزییات ", ltr: "Details of " };
 
-const title = ref(defaultTitle);
+const selectedLoan = ref<Loan | null>(null);
 
-const showAddHandler = () => {
+watch(
+  () => store.dir,
+  (dir: "rtl" | "ltr", prevDir: "rtl" | "ltr") => {
+    if (showTransaction.value) {
+      title.value = defaultDetailsTitle[store.dir] + selectedLoan.value!.name;
+    } else {
+      title.value = defaultTitle[dir];
+    }
+  }
+);
+const title = ref(defaultTitle[store.dir]);
+
+const showAddTransactionHandler = () => {
   showAddTransaction.value = true;
 };
 
-const headers = ref(["وام", "موعد", "وضعیت", "مانده"]);
-const rows = reactive([
-  {
-    id: "a",
-    name: "وام صادرات",
-    total_amount: "۱۰۰ میلیون",
-    due_date: "۳۰م هر ماه",
-    portion: "۱۲,۷۵۰,۰۰۰",
-    status: "بدهکار",
-    remainder: "۸۴۱,۵۰۰,۰۰۰",
-  },
-  {
-    id: "a",
-    name: "وام سپاه",
-    total_amount: "۱۰ میلیون",
-    due_date: "۳۰م هر ماه",
-    portion: "۳,۰۰۰,۰۰۰",
-    status: "بدهکار",
-    remainder: "۹۵,۰۰۰,۰۰۰",
-  },
-  {
-    id: "a",
-    name: "وام سپاه ۲",
-    total_amount: "۱۰ میلیون",
-    due_date: "۳۰م هر ماه",
-    portion: "۲,۵۰۰,۰۰۰",
-    status: "بدهکار",
-    remainder: "۷۱,۵۰۰,۰۰۰",
-  },
-  {
-    id: "a",
-    name: "وام ازدواج",
-    total_amount: "۵۰ میلیون",
-    due_date: "۱۳م هر ماه",
-    portion: "۶,۴۹۰,۰۰۰",
-    status: "بدهکار",
-    remainder: "۴۸۱,۵۰۰,۰۰۰",
-  },
-  {
-    id: "a",
-    name: "بدهی به عادل",
-    total_amount: "۱۰ میلیون",
-    due_date: "آخر سال",
-    portion: "۱۰۰,۰۰۰,۰۰۰",
-    status: "بدهکار",
-    remainder: "۱۰۰,۰۰۰,۰۰۰",
-  },
-  {
-    id: "a",
-    name: "بدهی به مرتضی",
-    total_amount: "۲۰ میلیون",
-    due_date: "هر زمان شد",
-    portion: "۲۰۰,۰۰۰,۰۰۰",
-    status: "بدهکار",
-    remainder: "۲۰۰,۰۰۰,۰۰۰",
-  },
-  {
-    id: "a",
-    name: "بدهی به مادر",
-    total_amount: "۷ میلیون",
-    due_date: "هر وقت شد",
-    portion: "۷۰,۰۰۰,۰۰۰",
-    status: "بدهکار",
-    remainder: "۷۰,۰۰۰,۰۰۰",
-  },
-]);
-const showTransaction = ref(false);
-const transactionRows = reactive([
-  {
-    name: "قسط 11 صادرات",
-    date: "1400/09/30",
-    amount: "12750000",
-  },
-  {
-    name: "قسط 12 صادرات",
-    date: "1400/09/30",
-    amount: "12750000",
-  },
-  {
-    name: "قسط 13 صادرات",
-    date: "1400/09/30",
-    amount: "12750000",
-  },
-  {
-    name: "قسط 15 صادرات",
-    date: "1400/09/30",
-    amount: "12750000",
-  },
-  {
-    name: "قسط 12 صادرات",
-    date: "1400/10/30",
-    amount: "12750000",
-  },
-  {
-    name: "قسط 12 صادرات",
-    date: "1400/11/30",
-    amount: "12750000",
-  },
-]);
+const showAddLoanHandler = () => {
+  showAddLoan.value = true;
+};
 
-const detailsHandler = (index: number) => {
+const headers = ref(["وام", "موعد", "وضعیت", "مانده"]);
+const rows = ref(allLoans);
+const showTransaction = ref(false);
+let transactionRows = ref<Transaction[]>([]);
+
+const modalCloseHandler = () => {
+  showAddTransaction.value = false;
+  showAddLoan.value = false;
+};
+
+const detailsHandler = (id: string) => {
+  const loan = rows.value.find(row => row.id === id);
+  selectedLoan.value = loan as Loan;
+  transactionRows.value = loan?.transactions as Transaction[];
   showTransaction.value = true;
-  title.value =
-    (store.dir === "rtl" ? "جزییات " : "Details of ") + loanNames.value[index];
+  title.value = defaultDetailsTitle[store.dir] + selectedLoan.value.name;
 };
 const backHandler = () => {
+  selectedLoan.value = null;
   showTransaction.value = false;
-  title.value = defaultTitle;
+  title.value = defaultTitle[store.dir];
 };
 
 const loanNames = computed(() => {
-  return rows.map((el) => el.name);
+  return rows.value.map((el, index) => ({ name: el.name, id: index.toString() }));
 });
+
+onMounted(async () => await fetchLoans());
 </script>
 
 <template>
-  <!-- <AddTransaction :loan-names /> -->
   <div class="max-w-4xl pt-28 flex flex-col">
+    <AddTransaction
+      :loan="selectedLoan!"
+      :is-shown="showAddTransaction"
+      v-if="showAddTransaction"
+      @onClose="modalCloseHandler"
+    />
+    <AddLoan :is-shown="showAddLoan" @onClose="modalCloseHandler" />
     <div class="flex justify-between">
       <div
-      v-if="!showTransaction"
-        class="
-          group
-          flex
-          items-center
-          rounded-md
-          bg-blue-500
-          text-white text-sm
-          font-medium
-          py-2
-          px-4
-          mb-4
-          cursor-pointer
-          shadow-sm
-          hover:bg-blue-400
-        "
-        @click="showAddHandler"
+        v-if="!showTransaction"
+        class="group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium py-2 px-4 mb-4 cursor-pointer shadow-sm hover:bg-blue-400"
+        @click="showAddLoanHandler"
       >
         {{ store.dir === "rtl" ? "وام جدید" : "New Loan" }}
         <svg width="20" height="20" fill="currentColor" class="mr-2">
@@ -161,22 +90,8 @@ const loanNames = computed(() => {
       </div>
       <div
         v-else
-        class="
-          group
-          flex
-          items-center
-          rounded-md
-          bg-blue-500
-          text-white text-sm
-          font-medium
-          py-2
-          px-4
-          mb-4
-          cursor-pointer
-          shadow-sm
-          hover:bg-blue-400
-        "
-        @click="showAddHandler"
+        class="group flex items-center rounded-md bg-blue-500 text-white text-sm font-medium py-2 px-4 mb-4 cursor-pointer shadow-sm hover:bg-blue-400"
+        @click="showAddTransactionHandler"
       >
         {{ store.dir === "rtl" ? "تراکنش جدید" : "New Transaction" }}
         <svg width="20" height="20" fill="currentColor" class="mr-2">
@@ -188,23 +103,15 @@ const loanNames = computed(() => {
       <button
         v-if="showTransaction"
         @click="backHandler"
-        class="
-          bg-red-200
-          text-red-600 text-sm
-          font-medium
-          rounded
-          px-4
-          py-2
-          mb-4
-          hover:(bg-red-300
-          text-red-700)
-        "
+        class="bg-red-200 text-red-600 text-sm font-medium rounded px-4 py-2 mb-4 hover:(bg-red-300 text-red-700)"
         type="button"
       >
         {{ store.dir === "rtl" ? "بازگشت" : "Back" }}
       </button>
     </div>
-    <div class="text-lg py-2 text-gray-900 dark:text-white font-semibold">{{ title }}</div>
+    <div class="text-xl py-2 mb-2 text-gray-600 dark:text-white font-semibold">
+      {{ title }}
+    </div>
     <Transactions v-if="showTransaction" :rows="transactionRows" />
     <Table
       v-else

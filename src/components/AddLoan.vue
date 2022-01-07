@@ -50,36 +50,46 @@
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="flex flex-col">
             <div id="loans mt-5">
-              <label for="loan-select" class="block">{{
+              <label for="loan-name" class="block">{{
                 store.dir === "rtl" ? "وام" : "Loan"
               }}</label>
               <input
                 type="text"
                 id="loan-name"
-                disabled
-                class="bg-gray-300 py-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-700"
-                v-model="loan.name"
-              />
-            </div>
-            <div id="name" class="mt-4">
-              <label for="transaction-name" class="block">{{
-                store.dir === "rtl" ? "عنوان پرداختی" : "Transaction Title"
-              }}</label>
-              <input
-                type="text"
-                id="transaction-name"
                 class="bg-gray-100 py-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-600"
                 v-model="form.name"
               />
             </div>
             <div id="amount" class="mt-4">
-              <label for="transaction-amount" class="block">{{
-                store.dir === "rtl" ? "مقدار پرداختی" : "Transaction Amount"
+              <label for="tinstallment-amount" class="block">{{
+                store.dir === "rtl" ? "مقدار قسط" : "Installment"
               }}</label>
               <input
                 type="number"
-                id="transaction-amount"
-                v-model="form.amount"
+                id="installment-amount"
+                v-model="form.portion"
+                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
+              />
+            </div>
+            <div id="name" class="mt-4">
+              <label for="total-amount" class="block">{{
+                store.dir === "rtl" ? "مقدار کلی وام" : "Loan Total Amount"
+              }}</label>
+              <input
+                type="number"
+                id="total-amount"
+                v-model="form.total_amount"
+                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
+              />
+            </div>
+            <div id="amount" class="mt-4">
+              <label for="month-day" class="block">{{
+                store.dir === "rtl" ? "زمان پرداختی ماهانه" : "Monthly Due Day"
+              }}</label>
+              <input
+                type="text"
+                id="month-day"
+                v-model="form.month_day"
                 class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
               />
             </div>
@@ -87,7 +97,7 @@
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button
-          @click="insertTransaction"
+          @click="insertLoan"
             type="button"
             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
           >
@@ -110,8 +120,7 @@
 import { reactive, ref } from "vue";
 import { store } from "../store";
 import { onClickOutside } from "@vueuse/core";
-import { Loan, Transaction } from "../helpers/interfaces";
-import { addTransaction } from "../vuetils/useLoans";
+import { addLoan, allLoans } from "../vuetils/useLoans";
 
 const target = ref(null);
 
@@ -121,21 +130,10 @@ const closeHandler = () => emit("onClose");
 
 const emit = defineEmits<{ (e: "onClose"): void }>();
 
-const props = defineProps<{
-  isShown: boolean;
-  loan: Loan;
-}>();
-
-const form = reactive<Transaction>({
-  loan_id: "",
-  name: "",
-  amount: props.loan?.portion,
-});
-
-async function insertTransaction() {
+async function insertLoan() {
   // Guard for short task descriptions which will fail db policy.
   if (form.name.length <= 3) {
-    alert("Please make your transaction a little more descriptive");
+    alert("Please make your task a little more descriptive");
     return;
   }
   // Type check to ensure user is still logged in.
@@ -145,19 +143,20 @@ async function insertTransaction() {
   }
   try {
     // Try and write the data to the database.
-    const transaction = await addTransaction({
-      loan_id: props.loan.id as string,
+    const loan = await addLoan({
+      user_id: store.userSession.user!.id,
       name: form.name,
-      amount: form.amount,
-      user_id: store.user?.id
+      month_day: form.month_day,
+      total_amount: form.total_amount,
+      portion: form.portion,
     });
 
     // If there was no response, don't do anything.
-    if (!transaction) {
+    if (!loan) {
       return;
     }
     // Otherwise, push the response into allTodos.
-    props.loan.transactions?.push(transaction);
+    allLoans.value.push(loan);
     emit('onClose');
 
     // Reset input field.
@@ -165,4 +164,20 @@ async function insertTransaction() {
     console.error("Unknown error when adding todo", err);
   }
 }
+
+const props = defineProps<{
+  isShown: boolean;
+}>();
+
+const form = reactive<{
+  name: string;
+  portion: number;
+  total_amount: number;
+  month_day: string;
+}>({
+  portion: 0,
+  name: "",
+  total_amount: 0,
+  month_day: "",
+});
 </script>

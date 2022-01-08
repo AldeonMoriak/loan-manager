@@ -28,11 +28,13 @@ jobs:
       # Runs a single command using the runners shell
       - name: install the dependencies
         run: npm install
+      
+      - name: install the dependencies
+        run: npm run build # run the "build" package script
 
       # Runs a set of commands using the runners shell
       - name: Build the app
         run: |
-          npm run build,
           cd dist,
           git init,
           git add .,

@@ -35,9 +35,8 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: deploy the app
         run: |
-          cd ./dist,
-          git init,
-          git add .,
+          git init ./dist,
+          git add . ./dist,
           git commit -m "deploy",
           git checkout -b gh-pages,
           git push -f https://github.com/AldeonMoriak/loan-manager.git gh-pages

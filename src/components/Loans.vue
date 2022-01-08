@@ -20,10 +20,11 @@ watch(
   () => store.dir,
   (dir: "rtl" | "ltr", prevDir: "rtl" | "ltr") => {
     if (showTransaction.value) {
-      title.value = defaultDetailsTitle[store.dir] + selectedLoan.value!.name;
+      title.value = defaultDetailsTitle[dir] + selectedLoan.value!.name;
     } else {
       title.value = defaultTitle[dir];
     }
+    headers.value = defaultHeaders[dir];
   }
 );
 const title = ref(defaultTitle[store.dir]);
@@ -36,18 +37,26 @@ const showAddLoanHandler = () => {
   showAddLoan.value = true;
 };
 
-const headers = ref(["وام", "موعد", "وضعیت", "مانده"]);
+const defaultHeaders = {
+  rtl: ["وام", "موعد", "وضعیت", "مانده"],
+  ltr: ["Loan", "Monthly Due", "Status", "Remainder"],
+};
+
+const headers = ref(defaultHeaders[store.dir]);
 const rows = ref(allLoans);
 const showTransaction = ref(false);
 let transactionRows = ref<Transaction[]>([]);
 
-const modalCloseHandler = () => {
+const modalCloseHandler = (transaction?: Transaction) => {
+  if (transaction) {
+    selectedLoan.value?.transactions?.push(transaction);
+  }
   showAddTransaction.value = false;
   showAddLoan.value = false;
 };
 
 const detailsHandler = (id: string) => {
-  const loan = rows.value.find(row => row.id === id);
+  const loan = rows.value.find((row) => row.id === id);
   selectedLoan.value = loan as Loan;
   transactionRows.value = loan?.transactions as Transaction[];
   showTransaction.value = true;
@@ -60,21 +69,28 @@ const backHandler = () => {
 };
 
 const loanNames = computed(() => {
-  return rows.value.map((el, index) => ({ name: el.name, id: index.toString() }));
+  return rows.value.map((el, index) => ({
+    name: el.name,
+    id: index.toString(),
+  }));
 });
 
 onMounted(async () => await fetchLoans());
 </script>
 
 <template>
-  <div class="max-w-4xl pt-28 flex flex-col">
-    <AddTransaction
-      :loan="selectedLoan!"
-      :is-shown="showAddTransaction"
-      v-if="showAddTransaction"
-      @onClose="modalCloseHandler"
-    />
-    <AddLoan :is-shown="showAddLoan" @onClose="modalCloseHandler" />
+  <div class="max-w-4xl pt-28 flex flex-col mx-4 lg:mx-auto">
+    <Teleport to="body">
+      <AddTransaction
+        :loan="selectedLoan!"
+        :is-shown="showAddTransaction"
+        v-if="showAddTransaction"
+        @onClose="modalCloseHandler"
+      />
+    </Teleport>
+    <Teleport to="body">
+      <AddLoan :is-shown="showAddLoan" @onClose="modalCloseHandler" />
+    </Teleport>
     <div class="flex justify-between">
       <div
         v-if="!showTransaction"

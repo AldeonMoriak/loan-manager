@@ -7,6 +7,7 @@ const toggleDark = useToggle(isDark);
 
 const changeDir = () => {
   store.dir = store.dir === "rtl" ? "ltr" : "rtl";
+  localStorage.setItem('lang', store.dir);
 };
 </script>
 <template>

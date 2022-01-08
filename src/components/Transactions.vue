@@ -72,8 +72,18 @@
 
 <script setup lang="ts">
 import { store } from "../store";
-import { ref, reactive } from "vue";
+import { ref, watch } from "vue";
+
+const defaultHeaders = {
+  rtl: ["تراکنش", "تاریخ", "مقدار"],
+  ltr: ['Transaction', 'Date', 'Amount']
+}
 
 const props = defineProps<{ rows: any[] }>();
-const headers = ref(["تراکنش", "تاریخ", "مقدار"]);
+const headers = ref(defaultHeaders[store.dir]);
+
+watch(() => store.dir,
+(dir: 'rtl' | 'ltr', prevDir: 'rtl' | 'ltr')=> {
+  headers.value = defaultHeaders[dir];
+})
 </script>

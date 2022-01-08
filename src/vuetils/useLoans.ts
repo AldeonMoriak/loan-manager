@@ -10,6 +10,7 @@ const allLoans = ref<Loan[]>([]);
  * Retrieve all todo for the signed in user
  */
 async function fetchLoans() {
+  store.loading = true;
   try {
     const { data: loans, error }: { data: Loan[] | null; error: any } =
       await supabase
@@ -33,6 +34,10 @@ async function fetchLoans() {
       if (loan.transactions) {
         loan.transactions.forEach((transaction) => {
           payedAmount += transaction.amount;
+
+          let [date, time]: string[] = transaction.created_at?.split("T")!;
+          time = time.split(".")[0];
+          transaction.created_at = date + " " + time;
         });
       }
       loan.remainder = loan.total_amount - payedAmount;
@@ -40,7 +45,9 @@ async function fetchLoans() {
     // store response to allTodos
     allLoans.value = loans;
     console.log("got loans!", allLoans.value);
+    store.loading = false;
   } catch (err) {
+    store.loading = false;
     console.error("Error retrieving data from db", err);
   }
 }
@@ -49,6 +56,7 @@ async function fetchLoans() {
  *  Add a new loan to supabase
  */
 async function addLoan(loan: Loan): Promise<null | Loan> {
+  store.loading = true;
   try {
     const { data, error } = await supabase.from("loans").insert(loan).single();
 
@@ -59,8 +67,10 @@ async function addLoan(loan: Loan): Promise<null | Loan> {
     }
 
     console.log("created a new loan");
+    store.loading = false;
     return data;
   } catch (err) {
+    store.loading = false;
     alert("Error");
     console.error("Unknown problem inserting to db", err);
     return null;
@@ -68,12 +78,18 @@ async function addLoan(loan: Loan): Promise<null | Loan> {
 }
 
 /**
- * 
+ *
  * add a new transaction
  */
-async function addTransaction(transaction: Transaction): Promise<null | Transaction> {
+async function addTransaction(
+  transaction: Transaction
+): Promise<null | Transaction> {
+  store.loading = true;
   try {
-    const { data, error } = await supabase.from("transactions").insert(transaction).single();
+    const { data, error } = await supabase
+      .from("transactions")
+      .insert(transaction)
+      .single();
 
     if (error) {
       alert(error.message);
@@ -82,8 +98,10 @@ async function addTransaction(transaction: Transaction): Promise<null | Transact
     }
 
     console.log("created a new transaction");
+    store.loading = false;
     return data;
   } catch (err) {
+    store.loading = false;
     alert("Error");
     console.error("Unknown problem inserting to db", err);
     return null;
@@ -94,6 +112,7 @@ async function addTransaction(transaction: Transaction): Promise<null | Transact
  * Targets a specific todo via its record id and updates the is_completed attribute.
  */
 async function updatePaymentCompletion(loan: Loan, isCompleted: boolean) {
+  store.loading = true;
   try {
     const { error } = await supabase
       .from("loans")
@@ -106,9 +125,11 @@ async function updatePaymentCompletion(loan: Loan, isCompleted: boolean) {
       console.error("There was an error updating", error);
       return;
     }
+    store.loading = false;
 
     console.log("Updated loan", loan.id);
   } catch (err) {
+    store.loading = false;
     alert("Error");
     console.error("Unknown problem updating record", err);
   }
@@ -118,12 +139,22 @@ async function updatePaymentCompletion(loan: Loan, isCompleted: boolean) {
  *  Deletes a todo via its id
  */
 async function deleteLoan(loan: Loan) {
+  store.loading = true;
   try {
     await supabase.from("loans").delete().eq("id", loan.id);
+    store.loading = false;
     console.log("deleted loan", loan.id);
   } catch (error) {
+    store.loading = false;
     console.error("error", error);
   }
 }
 
-export { allLoans, fetchLoans, addLoan, addTransaction, updatePaymentCompletion, deleteLoan };
+export {
+  allLoans,
+  fetchLoans,
+  addLoan,
+  addTransaction,
+  updatePaymentCompletion,
+  deleteLoan,
+};

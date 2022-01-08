@@ -119,7 +119,7 @@ onClickOutside(target, (event) => closeHandler());
 
 const closeHandler = () => emit("onClose");
 
-const emit = defineEmits<{ (e: "onClose"): void }>();
+const emit = defineEmits<{ (e: "onClose", transaction?: Transaction): void }>();
 
 const props = defineProps<{
   isShown: boolean;
@@ -157,8 +157,10 @@ async function insertTransaction() {
       return;
     }
     // Otherwise, push the response into allTodos.
-    props.loan.transactions?.push(transaction);
-    emit('onClose');
+    let [date, time]: string[] = transaction.created_at?.split('T')!;
+    time = time.split('.')[0]
+    transaction.created_at = date + ' ' + time;
+    emit('onClose', transaction);
 
     // Reset input field.
   } catch (err) {

@@ -45,13 +45,13 @@
       <div
         ref="target"
         :class="store.dir === 'rtl' ? 'text-right' : 'text-left'"
-        class="inline-block align-bottom bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+        class="inline-block align-bottom bg-white rounded-lg overflow-x-hidden overflow-y-scroll shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
       >
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="flex flex-col">
             <div id="loans mt-5">
               <label for="loan-name" class="block">{{
-                store.dir === "rtl" ? "وام" : "Loan"
+                store.dir === "rtl" ? "عنوان وام" : "Loan Name"
               }}</label>
               <input
                 type="text"
@@ -133,7 +133,7 @@ const emit = defineEmits<{ (e: "onClose"): void }>();
 async function insertLoan() {
   // Guard for short task descriptions which will fail db policy.
   if (form.name.length <= 3) {
-    alert("Please make your task a little more descriptive");
+    alert("Please make your loan a little more descriptive");
     return;
   }
   // Type check to ensure user is still logged in.

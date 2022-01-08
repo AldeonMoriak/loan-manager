@@ -20,8 +20,8 @@ jobs:
         npm install
         npm run build
       env:
-        VITE_SUPABASE_ANON_KEY: ${{ secrets.KEY }}
-        VITE_SUPABASE_URL: ${{ secrets.URL }}
+        VITE_SUPABASE_ANON_KEY: ${{ KEY }}
+        VITE_SUPABASE_URL: ${{ URL }}
 
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3

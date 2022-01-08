@@ -29,13 +29,13 @@ jobs:
       - name: install the dependencies
         run: npm install
       
-      - name: install the dependencies
+      - name: build the app
         run: npm run build # run the "build" package script
 
       # Runs a set of commands using the runners shell
-      - name: Build the app
+      - name: deploy the app
         run: |
-          cd dist,
+          cd ./dist,
           git init,
           git add .,
           git commit -m "deploy",

@@ -97,11 +97,14 @@
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button
-          @click="insertLoan"
+            @click="insertLoan"
             type="button"
             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
           >
-            {{ store.dir === "rtl" ? "ثبت" : "Save" }}
+            <span v-if="!store.loading">{{
+              store.dir === "rtl" ? "ثبت" : "Save"
+            }}</span>
+            <span v-else class="gg-spinner text-center"></span>
           </button>
           <button
             type="button"
@@ -155,11 +158,17 @@ async function insertLoan() {
     if (!loan) {
       return;
     }
+    loan.remainder = loan.total_amount;
+    loan.transactions = [];
     // Otherwise, push the response into allTodos.
     allLoans.value.push(loan);
-    emit('onClose');
+    emit("onClose");
 
     // Reset input field.
+    form.name = '';
+    form.month_day = '';
+    form.portion = 0;
+    form.total_amount = 0;
   } catch (err) {
     console.error("Unknown error when adding todo", err);
   }

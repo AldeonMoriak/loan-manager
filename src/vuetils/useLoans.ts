@@ -3,9 +3,24 @@ import { supabase } from "../helpers/supabase";
 import { ref } from "vue";
 import { Loan, Transaction } from "../helpers/interfaces";
 import { store } from "../store";
+import { PostgrestError } from "@supabase/supabase-js";
 
 const allLoans = ref<Loan[]>([]);
 
+function computeRemainder(loan: Loan): Loan{
+  let payedAmount = 0;
+  if (loan.transactions) {
+    loan.transactions.forEach((transaction) => {
+      payedAmount += transaction.amount;
+
+      transaction.created_at = new Date(
+        transaction.created_at as string
+      ).toLocaleString();
+    });
+  }
+  loan.remainder = loan.total_amount - payedAmount;
+  return loan;
+}
 /**
  * Retrieve all todo for the signed in user
  */
@@ -17,7 +32,11 @@ async function fetchLoans() {
         .from("loans")
         .select("*, transactions(*)")
         .eq("user_id", store.user?.id)
-        .order("id");
+        .order("created_at", { ascending: false })
+        .order("created_at", {
+          foreignTable: "transactions",
+          ascending: false,
+        });
 
     if (error) {
       console.log("error", error);
@@ -29,19 +48,10 @@ async function fetchLoans() {
       return;
     }
 
-    loans.map((loan) => {
-      let payedAmount = 0;
-      if (loan.transactions) {
-        loan.transactions.forEach((transaction) => {
-          payedAmount += transaction.amount;
-
-          let [date, time]: string[] = transaction.created_at?.split("T")!;
-          time = time.split(".")[0];
-          transaction.created_at = date + " " + time;
-        });
-      }
-      loan.remainder = loan.total_amount - payedAmount;
+    loans.forEach((loan) => {
+      computeRemainder(loan);
     });
+
     // store response to allTodos
     allLoans.value = loans;
     console.log("got loans!", allLoans.value);
@@ -67,37 +77,6 @@ async function addLoan(loan: Loan): Promise<null | Loan> {
     }
 
     console.log("created a new loan");
-    store.loading = false;
-    return data;
-  } catch (err) {
-    store.loading = false;
-    alert("Error");
-    console.error("Unknown problem inserting to db", err);
-    return null;
-  }
-}
-
-/**
- *
- * add a new transaction
- */
-async function addTransaction(
-  transaction: Transaction
-): Promise<null | Transaction> {
-  store.loading = true;
-  try {
-    const { data, error } = await supabase
-      .from("transactions")
-      .insert(transaction)
-      .single();
-
-    if (error) {
-      alert(error.message);
-      console.error("There was an error inserting", error);
-      return null;
-    }
-
-    console.log("created a new transaction");
     store.loading = false;
     return data;
   } catch (err) {
@@ -138,11 +117,15 @@ async function updatePaymentCompletion(loan: Loan, isCompleted: boolean) {
 /**
  *  Deletes a todo via its id
  */
-async function deleteLoan(loan: Loan) {
+async function deleteLoan(loan: Loan): Promise<PostgrestError | undefined> {
   store.loading = true;
   try {
-    await supabase.from("loans").delete().eq("id", loan.id);
+    const {error, data } = await supabase.from("loans").delete().eq("id", loan.id);
     store.loading = false;
+    if(error) {
+      console.log(error.message);
+      return error;
+    }
     console.log("deleted loan", loan.id);
   } catch (error) {
     store.loading = false;
@@ -150,11 +133,4 @@ async function deleteLoan(loan: Loan) {
   }
 }
 
-export {
-  allLoans,
-  fetchLoans,
-  addLoan,
-  addTransaction,
-  updatePaymentCompletion,
-  deleteLoan,
-};
+export { allLoans, fetchLoans, addLoan, updatePaymentCompletion, deleteLoan, computeRemainder };

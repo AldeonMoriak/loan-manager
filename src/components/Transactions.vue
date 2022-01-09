@@ -37,7 +37,11 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">
+                  <div
+                    class="text-sm text-gray-900"
+                    :class="store.dir === 'rtl' ? 'text-right' : 'text-left'"
+                    dir="ltr"
+                  >
                     {{ row.created_at }}
                   </div>
                 </td>
@@ -48,9 +52,11 @@
                   :class="store.dir === 'rtl' ? 'text-left' : 'text-right'"
                   class="px-6 py-4 whitespace-nowrap text-sm font-medium"
                 >
-                  <a href="#" class="text-indigo-600 hover:text-indigo-900">{{
-                    store.dir === "rtl" ? "حذف" : "Delete"
-                  }}</a>
+                  <a
+                    @click="deleteHandler(row, index)"
+                    class="cursor-pointer text-red-600 px-2 hover:(text-red-900 bg-red-100 rounded-xl)"
+                    >{{ store.dir === "rtl" ? "حذف" : "Delete" }}</a
+                  >
                 </td>
               </tr>
               <tr v-if="!props.rows.length">
@@ -73,17 +79,32 @@
 <script setup lang="ts">
 import { store } from "../store";
 import { ref, watch } from "vue";
+import { Loan, Transaction } from "../helpers/interfaces";
+import { deleteTransaction } from "../vuetils/useTransactions";
 
 const defaultHeaders = {
   rtl: ["تراکنش", "تاریخ", "مقدار"],
-  ltr: ['Transaction', 'Date', 'Amount']
-}
+  ltr: ["Transaction", "Date", "Amount"],
+};
 
-const props = defineProps<{ rows: any[] }>();
+const deleteHandler = async (row: Transaction, index: number) => {
+  try {
+    const error = await deleteTransaction(row);
+    if (error) {
+      console.error(error.message);
+    } else props.deleteTransactionHandler(index);
+  } catch (error) {}
+};
+const props = defineProps<{
+  rows: Transaction[];
+  deleteTransactionHandler: (index: number) => void;
+}>();
 const headers = ref(defaultHeaders[store.dir]);
 
-watch(() => store.dir,
-(dir: 'rtl' | 'ltr', prevDir: 'rtl' | 'ltr')=> {
-  headers.value = defaultHeaders[dir];
-})
+watch(
+  () => store.dir,
+  (dir: "rtl" | "ltr", prevDir: "rtl" | "ltr") => {
+    headers.value = defaultHeaders[dir];
+  }
+);
 </script>

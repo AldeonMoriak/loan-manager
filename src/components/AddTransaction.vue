@@ -87,11 +87,14 @@
         </div>
         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
           <button
-          @click="insertTransaction"
+            @click="insertTransaction"
             type="button"
             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
           >
-            {{ store.dir === "rtl" ? "ثبت" : "Save" }}
+            <span v-if="!store.loading">{{
+              store.dir === "rtl" ? "ثبت" : "Save"
+            }}</span>
+            <span v-else class="gg-spinner text-center"></span>
           </button>
           <button
             type="button"
@@ -111,7 +114,7 @@ import { reactive, ref } from "vue";
 import { store } from "../store";
 import { onClickOutside } from "@vueuse/core";
 import { Loan, Transaction } from "../helpers/interfaces";
-import { addTransaction } from "../vuetils/useLoans";
+import { addTransaction } from "../vuetils/useTransactions";
 
 const target = ref(null);
 
@@ -149,7 +152,7 @@ async function insertTransaction() {
       loan_id: props.loan.id as string,
       name: form.name,
       amount: form.amount,
-      user_id: store.user?.id
+      user_id: store.user?.id,
     });
 
     // If there was no response, don't do anything.
@@ -157,10 +160,10 @@ async function insertTransaction() {
       return;
     }
     // Otherwise, push the response into allTodos.
-    let [date, time]: string[] = transaction.created_at?.split('T')!;
-    time = time.split('.')[0]
-    transaction.created_at = date + ' ' + time;
-    emit('onClose', transaction);
+    transaction.created_at = new Date(
+      transaction.created_at as string
+    ).toLocaleString();
+    emit("onClose", transaction);
 
     // Reset input field.
   } catch (err) {

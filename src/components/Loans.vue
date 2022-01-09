@@ -5,7 +5,7 @@ import Transactions from "./Transactions.vue";
 import { store } from "../store";
 import AddTransaction from "./AddTransaction.vue";
 import AddLoan from "./AddLoan.vue";
-import { allLoans, deleteLoan, fetchLoans } from "../vuetils/useLoans";
+import { allLoans, computeRemainder, deleteLoan, fetchLoans } from "../vuetils/useLoans";
 import { Loan, Transaction } from "../helpers/interfaces";
 
 const showAddTransaction = ref(false);
@@ -15,6 +15,10 @@ const defaultTitle = { rtl: "لیست وام ها", ltr: "Loans List" };
 const defaultDetailsTitle = { rtl: "جزییات ", ltr: "Details of " };
 
 const selectedLoan = ref<Loan | null>(null);
+
+const deleteLoanHandler = (index: number) => {
+  rows.value.splice(index, 1);
+};
 
 watch(
   () => store.dir,
@@ -50,6 +54,7 @@ let transactionRows = ref<Transaction[]>([]);
 const modalCloseHandler = (transaction?: Transaction) => {
   if (transaction) {
     selectedLoan.value?.transactions?.push(transaction);
+    selectedLoan.value = computeRemainder(selectedLoan.value as Loan);
   }
   showAddTransaction.value = false;
   showAddLoan.value = false;
@@ -74,6 +79,10 @@ const loanNames = computed(() => {
     id: index.toString(),
   }));
 });
+
+const deleteTransactionHandler = (index: number) => {
+  selectedLoan.value!.transactions?.splice(index, 1);
+};
 
 onMounted(async () => await fetchLoans());
 </script>
@@ -128,13 +137,18 @@ onMounted(async () => await fetchLoans());
     <div class="text-xl py-2 mb-2 text-gray-600 dark:text-white font-semibold">
       {{ title }}
     </div>
-    <Transactions v-if="showTransaction" :rows="transactionRows" />
+    <Transactions
+      v-if="showTransaction"
+      :rows="transactionRows"
+      :delete-transaction-handler="deleteTransactionHandler"
+    />
     <Table
       v-else
       :rows="rows"
       :headers="headers"
       class
       @emit-details="detailsHandler"
+      @emit-delete-loan="deleteLoanHandler"
     />
   </div>
 </template>

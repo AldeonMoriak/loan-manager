@@ -83,18 +83,28 @@
                 >
                   <a
                     @click="emitDetailsHandler(row.id as string)"
-                    class="text-indigo-600 hover:text-indigo-900 cursor-pointer"
+                    class="text-indigo-600 px-2 hover:(text-indigo-900 bg-indigo-100 rounded) cursor-pointer"
                     >{{ store.dir === "rtl" ? "جزییات" : "Details" }}</a
+                  >
+                  <a
+                    @click="deleteHandler(row, index)"
+                    class="cursor-pointer text-red-600 px-2 hover:(text-red-900 bg-red-100 rounded)"
+                    >{{ store.dir === "rtl" ? "حذف" : "Delete" }}</a
                   >
                 </td>
               </tr>
-              <tr v-if="!rows.length">
+              <tr v-if="store.loading">
                 <td colspan="5" class="text-center">
-                {{
-                  store.dir === "rtl"
-                    ? "داده های موجود نیست"
-                    : "No Data Available"
-                }}
+                  <div class="gg-spinner text-center mx-auto"></div>
+                </td>
+              </tr>
+              <tr v-else-if="!rows.length">
+                <td colspan="5" class="text-center">
+                  {{
+                    store.dir === "rtl"
+                      ? "داده های موجود نیست"
+                      : "No Data Available"
+                  }}
                 </td>
               </tr>
             </tbody>
@@ -108,9 +118,24 @@
 <script setup lang="ts">
 import { Loan } from "../helpers/interfaces";
 import { store } from "../store";
+import { deleteLoan } from "../vuetils/useLoans";
 
 const props = defineProps<{ headers: string[]; rows: Loan[] }>();
-const emits = defineEmits<{ (e: "emitDetails", index: string): void }>();
+const emits = defineEmits<{
+  (e: "emitDetails", index: string): void;
+  (e: "emitDeleteLoan", index: number): void;
+}>();
+
+const deleteHandler = async (loan: Loan, index: number) => {
+  try {
+    const error  = await deleteLoan(loan);
+    if (error) {
+      console.log(error.message);
+    } else {
+      emits("emitDeleteLoan", index);
+    }
+  } catch (error) {}
+};
 
 const emitDetailsHandler = (id: string) => {
   emits("emitDetails", id);

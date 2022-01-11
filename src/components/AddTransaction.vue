@@ -1,7 +1,7 @@
 <template>
   <!-- This example requires Tailwind CSS v2.0+ -->
   <div
-    v-if="isShown"
+    v-if="props.isShown"
     class="fixed z-50 inset-0 overflow-y-hidden"
     aria-labelledby="modal-title"
     role="dialog"
@@ -45,7 +45,7 @@
       <div
         ref="target"
         :class="store.dir === 'rtl' ? 'text-right' : 'text-left'"
-        class="inline-block align-bottom bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+        class="inline-block align-bottom bg-white rounded-lg overflow-x-hidden overflow-y-scroll shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full max-h-screen"
       >
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="flex flex-col">
@@ -85,7 +85,7 @@
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <div class="bg-gray-50 px-4 pt-3 pb-6 sm:px-6 sm:flex sm:flex-row-reverse">
           <button
             @click="insertTransaction"
             type="button"

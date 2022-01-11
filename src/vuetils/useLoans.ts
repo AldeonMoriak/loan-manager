@@ -7,7 +7,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 
 const allLoans = ref<Loan[]>([]);
 
-function computeRemainder(loan: Loan): Loan{
+function computeRemainder(loan: Loan): Loan {
   let payedAmount = 0;
   if (loan.transactions) {
     loan.transactions.forEach((transaction) => {
@@ -65,25 +65,35 @@ async function fetchLoans() {
 /**
  *  Add a new loan to supabase
  */
-async function addLoan(loan: Loan): Promise<null | Loan> {
+async function addLoan(
+  loan: Loan
+): Promise<
+  { error: PostgrestError; data: null } | { data: Loan; error: null }
+> {
   store.loading = true;
   try {
     const { data, error } = await supabase.from("loans").insert(loan).single();
 
     if (error) {
-      alert(error.message);
       console.error("There was an error inserting", error);
-      return null;
+      return { error, data: null };
     }
 
     console.log("created a new loan");
     store.loading = false;
-    return data;
+    return { data, error: null };
   } catch (err) {
     store.loading = false;
-    alert("Error");
     console.error("Unknown problem inserting to db", err);
-    return null;
+    return {
+      error: {
+        message: store.dir === "rtl" ? "خطا" : "Error",
+        details: "",
+        hint: "",
+        code: "",
+      },
+      data: null,
+    };
   }
 }
 
@@ -120,9 +130,12 @@ async function updatePaymentCompletion(loan: Loan, isCompleted: boolean) {
 async function deleteLoan(loan: Loan): Promise<PostgrestError | undefined> {
   store.loading = true;
   try {
-    const {error, data } = await supabase.from("loans").delete().eq("id", loan.id);
+    const { error, data } = await supabase
+      .from("loans")
+      .delete()
+      .eq("id", loan.id);
     store.loading = false;
-    if(error) {
+    if (error) {
       console.log(error.message);
       return error;
     }
@@ -133,4 +146,11 @@ async function deleteLoan(loan: Loan): Promise<PostgrestError | undefined> {
   }
 }
 
-export { allLoans, fetchLoans, addLoan, updatePaymentCompletion, deleteLoan, computeRemainder };
+export {
+  allLoans,
+  fetchLoans,
+  addLoan,
+  updatePaymentCompletion,
+  deleteLoan,
+  computeRemainder,
+};

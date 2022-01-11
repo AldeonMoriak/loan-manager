@@ -19,3 +19,5 @@ export interface Transaction {
   loan_id: string,
   user_id?: string
 }
+
+export type AlertType = "info" | "warning" | "error" | "success";

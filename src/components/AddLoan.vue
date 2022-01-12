@@ -8,7 +8,7 @@
   <!-- This example requires Tailwind CSS v2.0+ -->
   <div
     v-if="props.isShown"
-    class="fixed z-50 inset-0 overflow-y-hidden"
+    class="fixed z-50 inset-0 overflow-y-hidden font-vazir"
     aria-labelledby="modal-title"
     role="dialog"
     aria-modal="true"
@@ -44,12 +44,13 @@
       <div
         ref="target"
         :class="store.dir === 'rtl' ? 'text-right' : 'text-left'"
-        class="inline-block align-bottom bg-white rounded-lg overflow-x-hidden overflow-y-scroll shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full max-h-screen"
+        class="inline-block align-bottom bg-white rounded-lg overflow-x-hidden overflow-y-auto shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full max-h-screen"
       >
         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
           <div class="flex flex-col">
+            <div class="text-xl font-bold text-gray-500 mb-4">{{ store.dir === 'rtl' ? 'افزودن وام به لیست' : 'Add Loan to the list' }}</div>
             <div id="loans mt-5">
-              <label for="loan-name" class="block">
+              <label for="loan-name" class="block text-gray-600 text-sm">
                 {{
                   store.dir === "rtl" ? "عنوان وام" : "Loan Name"
                 }}
@@ -57,12 +58,12 @@
               <input
                 type="text"
                 id="loan-name"
-                class="bg-gray-100 py-2 mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-600"
+                class="bg-gray-100 py-2 px-4  focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-600"
                 v-model="form.name"
               />
             </div>
             <div id="amount" class="mt-4">
-              <label for="tinstallment-amount" class="block">
+              <label for="tinstallment-amount" class="block text-gray-600 text-sm">
                 {{
                   store.dir === "rtl" ? "مقدار قسط" : "Installment"
                 }}
@@ -71,11 +72,11 @@
                 type="number"
                 id="installment-amount"
                 v-model="form.portion"
-                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
+                class=" focus:ring-indigo-500 px-4 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
               />
             </div>
             <div id="name" class="mt-4">
-              <label for="total-amount" class="block">
+              <label for="total-amount" class="block text-gray-600 text-sm">
                 {{
                   store.dir === "rtl" ? "مقدار کلی وام" : "Loan Total Amount"
                 }}
@@ -84,11 +85,11 @@
                 type="number"
                 id="total-amount"
                 v-model="form.total_amount"
-                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
+                class=" focus:ring-indigo-500 px-4 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
               />
             </div>
             <div id="amount" class="mt-4">
-              <label for="month-day" class="block">
+              <label for="month-day" class="block text-gray-600 text-sm">
                 {{
                   store.dir === "rtl" ? "زمان پرداختی ماهانه" : "Monthly Due Day"
                 }}
@@ -97,12 +98,12 @@
                 type="text"
                 id="month-day"
                 v-model="form.month_day"
-                class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
+                class=" focus:ring-indigo-500 px-4 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
               />
             </div>
           </div>
         </div>
-        <div class="bg-gray-50 px-4 pt-3 pb-6 sm:px-6 sm:flex sm:flex-row-reverse">
+        <div class="bg-gray-50 px-4 pt-3 pb-6 sm:px-6 sm:flex" :class="store.dir === 'ltr' ? 'sm:flex-row-reverse' : 'sm:flex-row'">
           <button
             @click="insertLoan"
             type="button"

@@ -60,10 +60,10 @@
                 </td>
               </tr>
               <tr v-if="!props.rows.length">
-                <td class="text-center" colspan="4">
+                <td class="text-center h-10 text-sm font-light" colspan="4">
                   {{
                     store.dir === "ltr"
-                      ? "No Data Available"
+                      ? "no data available"
                       : "داده ای موجود نیست"
                   }}
                 </td>

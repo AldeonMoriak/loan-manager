@@ -4,11 +4,13 @@
     @emit-close="isAlertShown = false"
     :type="alertType"
     :message="alertMessage"
+    :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'"
   />
   <!-- This example requires Tailwind CSS v2.0+ -->
   <div
     v-if="props.isShown"
-    class="fixed z-50 inset-0 overflow-y-hidden font-vazir"
+    class="fixed z-50 inset-0 overflow-y-hidden"
+    :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'"
     aria-labelledby="modal-title"
     role="dialog"
     aria-modal="true"

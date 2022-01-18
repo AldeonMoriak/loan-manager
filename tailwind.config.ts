@@ -7,7 +7,7 @@ export default defineConfig({
     extend: {
       fontFamily: {
         vazir: ["Vazir", "Roboto", "sans-serif"],
-        poppins: ['Poppins', 'sans-serif', 'Vazir']
+        poppins: ["Poppins", "Vazir", "sans-serif"],
       },
     },
   },

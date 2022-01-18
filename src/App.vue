@@ -17,7 +17,7 @@ supabase.auth.onAuthStateChange((_, session) => {
 
 <template>
   <div
-    class="duration-500 transition-all dark:bg-gray-600 bg-gray-100 min-h-screen max-w-7xl mx-auto"
+    class="duration-500 transition-all dark:bg-gray-600 bg-gray-100 min-w-460px min-h-screen max-w-7xl mx-auto"
     :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'"
     :dir="store.dir"
   >

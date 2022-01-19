@@ -6,7 +6,7 @@ export default defineConfig({
   theme: {
     extend: {
       fontFamily: {
-        vazir: ["Vazir", "Roboto", "sans-serif"],
+        vazir: ["Vazir", "Poppins", "Roboto", "sans-serif"],
         poppins: ["Poppins", "Vazir", "sans-serif"],
       },
     },

@@ -17,18 +17,19 @@ supabase.auth.onAuthStateChange((_, session) => {
 
 <template>
   <div
-    class="duration-500 transition-all dark:bg-gray-600 bg-gray-100 min-w-360px min-h-screen max-w-7xl mx-auto"
+    class="duration-500 transition-all dark:bg-gray-600 bg-gray-100 min-w-360px max-w-7xl min-h-screen mx-auto flex flex-col"
     :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'"
     :dir="store.dir"
   >
-    <div v-if="store.user">
+    <div class="min-h-[calc(100vh-50px)]">
       <TheHeader />
-      <Loans class="mx-auto" />
+      <div v-if="store.user" >
+        <Loans class="mx-auto " />
+      </div>
+      <div v-else>
+        <Login class=""></Login>
+      </div>
     </div>
-    <div v-else class="">
-      <TheHeader />
-      <Login></Login>
-    </div>
-    <TheFooter class="w-full font-vazir"/>
+    <TheFooter class="w-full font-vazir h-50px" />
   </div>
 </template>

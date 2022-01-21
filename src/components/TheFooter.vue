@@ -2,7 +2,7 @@
 import { store } from "../store";
 </script>
 <template>
-  <footer class=" w-full text-center font-normal text-base dark:text-white">
+  <footer class=" w-full text-center font-normal text-base dark:text-white font-poppins">
     <template v-if="store.dir === 'ltr'" >
       Made with <span class="text-red-600">❤️</span> by
       <span

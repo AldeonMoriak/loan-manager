@@ -30,6 +30,6 @@ supabase.auth.onAuthStateChange((_, session) => {
         <Login class=""></Login>
       </div>
     </div>
-    <TheFooter class="w-full font-vazir h-50px" />
+    <TheFooter class="w-full h-50px" />
   </div>
 </template>

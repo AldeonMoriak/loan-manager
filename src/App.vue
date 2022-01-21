@@ -23,8 +23,8 @@ supabase.auth.onAuthStateChange((_, session) => {
   >
     <div class="min-h-[calc(100vh-50px)]">
       <TheHeader />
-      <div v-if="store.user" >
-        <Loans class="mx-auto " />
+      <div v-if="store.user">
+        <Loans class="mx-auto" />
       </div>
       <div v-else>
         <Login class=""></Login>

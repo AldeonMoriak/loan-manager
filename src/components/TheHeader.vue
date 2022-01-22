@@ -105,7 +105,7 @@ const changeDir = () => {
         </div>
       </div>
     </div>
-    <div class="ml-3 relative pt-4" ref="target" v-if="store.user">
+    <div class="ml-3 relative pt-4" ref="target">
       <div class>
         <button
           type="button"
@@ -116,7 +116,7 @@ const changeDir = () => {
           @click="clickHandler"
         >
           <span class="sr-only">Open user menu</span>
-          <span class="h-8">{{ store.user?.email }}</span>
+          <span class="h-8">{{ store.user?.email?? 'aldeonmoriak@gmial.com' }}</span>
         </button>
       </div>
 
@@ -141,7 +141,7 @@ const changeDir = () => {
         <!-- Active: "bg-gray-100", Not Active: "" -->
         <a
           @click="signOutHandler"
-          class="block px-4 py-2 text-sm text-gray-700"
+          class="block px-4 py-2 text-sm text-gray-700 cursor-pointer"
           :class="store.dir === 'rtl' ? 'text-right' : 'text-left'"
           role="menuitem"
           tabindex="-1"

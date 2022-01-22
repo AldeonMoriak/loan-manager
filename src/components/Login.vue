@@ -5,9 +5,10 @@
     :type="alertType"
     :message="alertMessage"
   />
+  <div class="min-h-32"></div>
   <form
     novalidate
-    class="mx-auto w-md h-64 flex flex-col bg-white rounded p-4 shadow shadow-gray-800/50"
+    class="mx-auto max-w-22rem md:max-w-md h-full flex flex-col bg-white rounded p-4 shadow shadow-gray-800/50"
     @submit.prevent="handleLogin"
   >
     <div class="h-full">
@@ -18,14 +19,16 @@
             : "Sign In to LoanManager App"
         }}
       </h1>
-      <p class="text-gray-500 text-base mt-8 text-center">
+      <div class="min-h-8"></div>
+      <p class="text-gray-500 text-base text-center">
         {{ store.dir === "ltr" ? "Sign in via" : "ورود توسط" }}
         <span
           class="underline underline-2 text-black underline-offset-4 underline-yellow-500 text-left"
         >{{ store.dir === "ltr" ? "magic link" : "لینک جادویی" }}</span>
         {{ store.dir === "ltr" ? "with your email below" : "با ایمیل خود" }}
       </p>
-      <div class="text-left mt-6">
+      <div class="min-h-6"></div>
+      <div class="text-left">
         <input
           dir="auto"
           class="p-2 rounded text-gray-500 focus:text-gray-700 bg-gray-200 focus:(ring-2 ring-blue-300) w-full"
@@ -37,7 +40,8 @@
         />
       </div>
     </div>
-    <div class="mt-4">
+    <div class="min-h-4"></div>
+    <div class="">
       <button
         type="submit"
         :disabled="isButtonDisable"

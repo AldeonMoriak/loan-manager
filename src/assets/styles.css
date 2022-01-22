@@ -35,3 +35,7 @@
   0% { transform: rotate(0deg) }
   to { transform: rotate(359deg) }
  } 
+ 
+ html.dark {
+   background: #121212;
+ }

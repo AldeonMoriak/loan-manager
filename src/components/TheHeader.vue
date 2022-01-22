@@ -10,8 +10,8 @@ const toggleDark = useToggle(isDark);
 
 const isDropdownVisible = ref(false);
 
-const signOutHandler = () => {
-  supabase.auth.signOut();
+const signOutHandler = async () => {
+  await supabase.auth.signOut();
 }
 
 const clickHandler = () => {
@@ -105,7 +105,7 @@ const changeDir = () => {
         </div>
       </div>
     </div>
-    <div class="ml-3 relative pt-4" ref="target">
+    <div class="ml-3 relative pt-4" ref="target" v-if="store.user">
       <div class>
         <button
           type="button"
@@ -116,7 +116,7 @@ const changeDir = () => {
           @click="clickHandler"
         >
           <span class="sr-only">Open user menu</span>
-          <span class="h-8">{{ store.user?.email?? 'aldeonmoriak@gmial.com' }}</span>
+          <span class="h-8">{{ store.user?.email }}</span>
         </button>
       </div>
 

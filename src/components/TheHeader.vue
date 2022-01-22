@@ -131,7 +131,7 @@ const changeDir = () => {
               To: "transform opacity-0 scale-95"
       -->
       <div
-        v-if="isDropdownVisible"
+        v-if="false"
         class="origin-top-right absolute left-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
         role="menu"
         aria-orientation="vertical"

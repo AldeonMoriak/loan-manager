@@ -57,6 +57,7 @@
               }}</label>
               <input
                 type="text"
+                ref="input"
                 id="loan-name"
                 disabled
                 class="px-4 bg-gray-300 py-2  focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-700"
@@ -114,9 +115,13 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import { store } from "../store";
-import { onClickOutside } from "@vueuse/core";
+import { onClickOutside, useFocus } from "@vueuse/core";
 import { Loan, Transaction } from "../helpers/interfaces";
 import { addTransaction } from "../vuetils/useTransactions";
+
+const input = ref();
+
+const {focused: inputFocus } = useFocus({target: input, initialValue: true});
 
 const target = ref(null);
 

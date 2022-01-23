@@ -31,6 +31,7 @@
       <div class="text-left">
         <input
           dir="auto"
+          ref="input"
           class="p-2 rounded text-gray-500 focus:text-gray-700 bg-gray-200 focus:(ring-2 ring-blue-300) w-full"
           type="email"
           id="email"
@@ -56,6 +57,7 @@
 
 <script lang="ts" setup>
 import { ApiError, Session } from "@supabase/gotrue-js";
+import { useFocus } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { AlertType } from "../helpers/interfaces";
 import { supabase } from "../helpers/supabase";
@@ -69,6 +71,10 @@ const isAlertShown = ref(false);
 const isButtonDisable = computed(() => {
   return !email.value || loading.value;
 });
+
+const input = ref();
+
+const {focused: inputFocus } = useFocus({target: input, initialValue: true});
 
 const handleLogin = async () => {
   try {

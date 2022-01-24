@@ -112,7 +112,7 @@ const alertType = ref<AlertType>("error");
 
 const input = ref();
 
-const { focused: inputFocus } = useFocus({ target: input, initialValue: true });
+useFocus({ target: input, initialValue: true });
 const target = ref(null);
 
 onClickOutside(target, (event) => closeHandler());
@@ -127,10 +127,17 @@ async function insertLoan() {
     alertMessage.value = store.dir === 'rtl' ? 'عنوان وام خیلی کوچیکه!' : "Please make your loan a little more descriptive";
     alertType.value = 'error';
     isAlertShown.value = true;
+    return;
   }
   // Type check to ensure user is still logged in.
   if (store.userSession === null) {
     alertMessage.value = store.dir === 'rtl' ? 'لطفا دوباره وارد شوید' : "Please log in again";
+    alertType.value = 'error';
+    isAlertShown.value = true;
+    return;
+  }
+  if(!form.month_day || !form.portion || !form.total_amount || form.total_amount === 0 || form.portion === 0) {
+    alertMessage.value = store.dir === 'rtl' ? 'مقادیر صحیح نمی‌باشد' : "Please enter valid inputs";
     alertType.value = 'error';
     isAlertShown.value = true;
     return;

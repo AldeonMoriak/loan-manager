@@ -1,4 +1,5 @@
 <template>
+<delete-modal :is-modal-shown="isModalShown" @emit-cancel="onClickCancel" @emit-delete="deleteHandler"/>
   <!-- This example requires Tailwind CSS v2.0+ -->
   <div class="flex flex-col">
     <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -53,8 +54,8 @@
                   class="px-6 py-4 whitespace-nowrap text-sm font-medium"
                 >
                   <a
-                    @click="deleteHandler(row, index)"
-                    class="cursor-pointer text-red-600 px-2 hover:(text-red-900 bg-red-100 rounded-xl)"
+                    @click="onClickDelete(row, index)"
+                    class="cursor-pointer text-red-600 py-1 px-2 hover:(text-red-900 bg-red-100 rounded)"
                     >{{ store.dir === "rtl" ? "حذف" : "Delete" }}</a
                   >
                 </td>
@@ -78,22 +79,38 @@
 
 <script setup lang="ts">
 import { store } from "../store";
-import { ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { Loan, Transaction } from "../helpers/interfaces";
 import { deleteTransaction } from "../vuetils/useTransactions";
+import DeleteModal from "./DeleteModal.vue";
 
 const defaultHeaders = {
   rtl: ["تراکنش", "تاریخ", "مقدار"],
   ltr: ["Transaction", "Date", "Amount"],
 };
 
-const deleteHandler = async (row: Transaction, index: number) => {
+const isModalShown = ref(false);
+let deleteCandidate = reactive<{transaction?: Transaction, index?: number}>({})
+
+const onClickDelete = (transaction: Transaction, index: number) => {
+  deleteCandidate = {transaction, index};
+  isModalShown.value = true;
+}
+
+const onClickCancel = () => {
+  deleteCandidate = {};
+  isModalShown.value = false;
+}
+
+const deleteHandler = async () => {
+  const {transaction, index} = deleteCandidate;
   try {
-    const error = await deleteTransaction(row);
+    const error = await deleteTransaction(transaction!);
     if (error) {
       console.error(error.message);
-    } else props.deleteTransactionHandler(index);
+    } else props.deleteTransactionHandler(index!);
   } catch (error) {}
+  onClickCancel();
 };
 const props = defineProps<{
   rows: Transaction[];

@@ -1,4 +1,11 @@
 <template>
+  <Alert
+    v-if="isAlertShown"
+    @emit-close="isAlertShown = false"
+    :type="alertType"
+    :message="alertMessage"
+    :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'"
+  />
   <!-- This example requires Tailwind CSS v2.0+ -->
   <ModalContainer :is-shown="props.isShown">
     <div
@@ -84,13 +91,16 @@
 import { reactive, ref } from "vue";
 import { store } from "../store";
 import { onClickOutside, useFocus } from "@vueuse/core";
-import { Loan, Transaction } from "../helpers/interfaces";
+import { AlertType, Loan, Transaction } from "../helpers/interfaces";
 import { addTransaction } from "../vuetils/useTransactions";
 import ModalContainer from "./ModalContainer.vue";
 
 const input = ref();
+const isAlertShown = ref(false);
+const alertMessage = ref('');
+const alertType = ref<AlertType>("error");
 
-const { focused: inputFocus } = useFocus({ target: input, initialValue: true });
+useFocus({ target: input, initialValue: true });
 
 const target = ref(null);
 
@@ -114,12 +124,22 @@ const form = reactive<Transaction>({
 async function insertTransaction() {
   // Guard for short task descriptions which will fail db policy.
   if (form.name.length <= 3) {
-    alert("Please make your transaction a little more descriptive");
+    alertMessage.value = store.dir === 'rtl' ? 'عنوان خیلی کوچیکه!' : "Please make your transaction a little more descriptive";
+    alertType.value = 'error';
+    isAlertShown.value = true;
     return;
   }
   // Type check to ensure user is still logged in.
   if (store.userSession === null) {
-    alert("Please log in again");
+    alertMessage.value = store.dir === 'rtl' ? 'لطفا دوباره وارد شوید' : "Please log in again";
+    alertType.value = 'error';
+    isAlertShown.value = true;
+    return;
+  }
+  if(!form.amount || form.amount === 0) {
+    alertMessage.value = store.dir === 'rtl' ? 'مقدار پرداختی وارد نشده' : "Please enter a valid value for transaction amount";
+    alertType.value = 'error';
+    isAlertShown.value = true;
     return;
   }
   try {

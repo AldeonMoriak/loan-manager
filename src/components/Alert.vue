@@ -4,7 +4,7 @@
     <!-- Alert Error -->
     <div
       :class="[
-        'fixed left-2 bottom-2  px-2 py-4 my-4 rounded-md text-lg flex flex-col max-w-96 w-3/4 lg:w-1/4 transition duration-500 ease-out z-10',
+        'fixed left-2 bottom-2  px-2 py-4 my-4 rounded-md text-lg flex flex-col max-w-96 w-3/4 lg:w-1/4 transition duration-500 ease-out z-100',
         backgroundColor,
       ]"
     >

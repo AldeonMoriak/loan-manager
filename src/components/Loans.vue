@@ -73,13 +73,6 @@ const backHandler = () => {
   title.value = defaultTitle[store.dir];
 };
 
-const loanNames = computed(() => {
-  return rows.value.map((el, index) => ({
-    name: el.name,
-    id: index.toString(),
-  }));
-});
-
 const deleteTransactionHandler = (index: number) => {
   selectedLoan.value!.transactions?.splice(index, 1);
 };

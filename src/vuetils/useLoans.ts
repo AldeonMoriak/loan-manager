@@ -39,11 +39,13 @@ async function fetchLoans() {
         });
 
     if (error) {
+      store.loading = false;
       console.log("error", error);
       return;
     }
     // handle for when no todos are returned
     if (loans === null) {
+      store.loading = false;
       allLoans.value = [];
       return;
     }

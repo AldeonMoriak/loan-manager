@@ -32,6 +32,14 @@ watch(
   }
 );
 const title = ref(defaultTitle[store.dir]);
+const isEdit = ref(false);
+const editTransactionContent = ref<Transaction>();
+
+const onEditTransaction = (transaction: Transaction, index: number) => {
+  isEdit.value = true;
+  editTransactionContent.value = transaction;
+  showAddTransactionHandler();
+}
 
 const showAddTransactionHandler = () => {
   showAddTransaction.value = true;
@@ -87,6 +95,8 @@ onMounted(async () => await fetchLoans());
         :loan="selectedLoan!"
         :is-shown="showAddTransaction"
         v-if="showAddTransaction"
+        :isContentEditable="isEdit"
+        :editContent="editTransactionContent!"
         @onClose="modalCloseHandler"
       />
     </Teleport>
@@ -127,13 +137,14 @@ onMounted(async () => await fetchLoans());
         {{ store.dir === "rtl" ? "بازگشت" : "Back" }}
       </button>
     </div>
-    <div class="text-xl py-2 mb-2 text-gray-600 dark:text-white font-semibold">
+    <div class="text-xl py-2 mb-2 text-gray-600 dark:text-white font-semibold font-poppins">
       {{ title }}
     </div>
     <Transactions
       v-if="showTransaction"
       :rows="transactionRows"
       :delete-transaction-handler="deleteTransactionHandler"
+      @emit-edit-content="onEditTransaction"
     />
     <Table
       v-else

@@ -1,5 +1,9 @@
 <template>
-<delete-modal :is-modal-shown="isModalShown" @emit-cancel="onClickCancel" @emit-delete="deleteHandler"/>
+  <delete-modal
+    :is-modal-shown="isModalShown"
+    @emit-cancel="onClickCancel"
+    @emit-delete="deleteHandler"
+  />
   <!-- This example requires Tailwind CSS v2.0+ -->
   <div class="flex flex-col">
     <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -58,9 +62,18 @@
                     }}
                   </span>
                 </td>
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                >{{ $formatPrice(row.remainder as number) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div>
+                      <div
+                        class="text-sm font-medium text-gray-900"
+                      >{{ $formatPrice(row.remainder as number) }}</div>
+                      <div
+                        class="text-sm text-gray-500"
+                      >{{ remainingTime(row.remainder as number, row.portion) }}</div>
+                    </div>
+                  </div>
+                </td>
                 <td
                   :class="store.dir === 'rtl' ? 'text-left' : 'text-right'"
                   class="px-6 py-4 whitespace-nowrap text-sm font-medium"
@@ -98,11 +111,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { Loan } from "../helpers/interfaces";
 import { store } from "../store";
 import { deleteLoan } from "../vuetils/useLoans";
 import DeleteModal from "./DeleteModal.vue";
+import { calculateRemainingTime } from "../helpers/remainingTimeCalculator";
 
 const props = defineProps<{ headers: string[]; rows: Loan[] }>();
 const emits = defineEmits<{
@@ -110,11 +124,34 @@ const emits = defineEmits<{
   (e: "emitDeleteLoan", index: number): void;
 }>();
 
+const remainingTime = (remainder: number, portion: number) => {
+  const [years, months] = calculateRemainingTime(remainder, portion)
+  let yearText = '';
+  let monthText = '';
+  if (store.dir === 'ltr') {
+    yearText = ' years'
+    monthText = ' months'
+  } else {
+    yearText = ' سال'
+    monthText = ' ماه'
+  }
+  if (months === 1 && store.dir === 'ltr') {
+    monthText = ' month';
+  }
+  if (years) {
+    if (years === 1 && store.dir === 'ltr') {
+      yearText = ' year'
+    }
+    return years + yearText + ` ${store.dir === 'ltr' ? 'and ' : 'و '}` + months + monthText;
+  }
+  return months + monthText;
+}
+
 const isModalShown = ref(false);
-let deleteCandidate = reactive<{loan?: Loan, index?: number}>({})
+let deleteCandidate = reactive<{ loan?: Loan, index?: number }>({})
 
 const onClickDelete = (loan: Loan, index: number) => {
-  deleteCandidate = {loan, index};
+  deleteCandidate = { loan, index };
   isModalShown.value = true;
 }
 
@@ -124,7 +161,7 @@ const onClickCancel = () => {
 }
 
 const deleteHandler = async () => {
-  const {loan, index} = deleteCandidate;
+  const { loan, index } = deleteCandidate;
   try {
     const error = await deleteLoan(loan!);
     if (error) {

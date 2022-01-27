@@ -116,7 +116,7 @@ const changeDir = () => {
           @click="clickHandler"
         >
           <span class="sr-only">Open user menu</span>
-          <span class="h-8">{{ store.user?.email }}</span>
+          <span class="h-8 font-poppins">{{ store.user?.email }}</span>
         </button>
       </div>
 

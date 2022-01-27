@@ -26,6 +26,7 @@
             </label>
             <input
               type="text"
+              dir="auto"
               id="loan-name"
               disabled
               class="px-4 bg-gray-300 py-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-700"
@@ -40,6 +41,7 @@
             </label>
             <input
               type="text"
+              dir="auto"
               ref="input"
               id="transaction-name"
               class="bg-gray-100 py-2 px-4 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-600"

@@ -148,7 +148,7 @@ async function insertTransaction() {
     // Try and write the data to the database.
     const transaction = await addTransaction({
       loan_id: props.loan.id as string,
-      name: form.name,
+      name: form.name.trim(),
       amount: form.amount,
       user_id: store.user?.id,
     });

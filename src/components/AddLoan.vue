@@ -148,8 +148,8 @@ async function insertLoan() {
     // Try and write the data to the database.
     const { error, data: loan } = await addLoan({
       user_id: store.userSession.user!.id,
-      name: form.name,
-      month_day: form.month_day,
+      name: form.name.trim(),
+      month_day: form.month_day.trim(),
       total_amount: form.total_amount,
       portion: form.portion,
     });

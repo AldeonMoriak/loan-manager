@@ -43,38 +43,56 @@ async function addTransaction(
 /**
  * Targets a specific todo via its record id and updates the is_completed attribute.
  */
-async function updateTransaction(transaction: Transaction) {
+async function updateTransaction(
+  transaction: Transaction
+): Promise<
+  { error: PostgrestError; data: null } | { data: Transaction; error: null }
+> {
   store.loading = true;
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("transactions")
       .update({ ...transaction })
       .eq("id", transaction.id)
       .single();
 
     if (error) {
-      alert(error.message);
+      store.loading = false;
       console.error("There was an error updating", error);
-      return;
+      return { error, data: null };
     }
     store.loading = false;
 
     console.log("Updated transaction", transaction.id);
+    return { data, error: null };
   } catch (err) {
     store.loading = false;
-    alert("Error");
     console.error("Unknown problem updating record", err);
+    return {
+      error: {
+        message: store.dir === "rtl" ? "خطا" : "Error",
+        details: "",
+        hint: "",
+        code: "",
+      },
+      data: null,
+    };
   }
 }
 
 /**
  *  Deletes a todo via its id
  */
-async function deleteTransaction(transaction: Transaction): Promise<PostgrestError | undefined> {
+async function deleteTransaction(
+  transaction: Transaction
+): Promise<PostgrestError | undefined> {
   store.loading = true;
   try {
-    const {error, data } = await supabase.from("transactions").delete().eq("id", transaction.id);
-    if(error) {
+    const { error, data } = await supabase
+      .from("transactions")
+      .delete()
+      .eq("id", transaction.id);
+    if (error) {
       return error;
     }
     store.loading = false;
@@ -85,8 +103,4 @@ async function deleteTransaction(transaction: Transaction): Promise<PostgrestErr
   }
 }
 
-export {
-  addTransaction,
-  updateTransaction,
-  deleteTransaction,
-};
+export { addTransaction, updateTransaction, deleteTransaction };

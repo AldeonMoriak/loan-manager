@@ -6,7 +6,6 @@
     :message="alertMessage"
     :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'"
   />
-  <!-- This example requires Tailwind CSS v2.0+ -->
   <ModalContainer :is-shown="props.isShown">
     <div
       ref="target"
@@ -17,47 +16,59 @@
         <div class="flex flex-col">
           <div
             class="text-xl font-bold text-gray-500 mb-4"
-          >{{ store.dir === 'rtl' ? 'ویرایش قسط' : 'Edit Transaction' }}</div>
+          >{{ store.dir === 'rtl' ? 'ویرایش وام' : 'Edit Loan' }}</div>
           <div id="loans mt-5">
-            <label for="loan-select" class="block text-gray-600 text-sm">
+            <label for="loan-name" class="block text-gray-600 text-sm">
               {{
-                store.dir === "rtl" ? "وام" : "Loan"
-              }}
-            </label>
-            <input
-              type="text"
-              dir="auto"
-              id="loan-name"
-              disabled
-              class="px-4 bg-gray-300 py-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-700"
-              v-model="loan.name"
-            />
-          </div>
-          <div id="name" class="mt-4">
-            <label for="transaction-name" class="block text-gray-600 text-sm">
-              {{
-                store.dir === "rtl" ? "عنوان پرداختی" : "Transaction Title"
+                store.dir === "rtl" ? "عنوان وام" : "Loan Name"
               }}
             </label>
             <input
               type="text"
               dir="auto"
               ref="input"
-              id="transaction-name"
+              id="loan-name"
               class="bg-gray-100 py-2 px-4 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md text-gray-600"
               v-model="form.name"
             />
           </div>
           <div id="amount" class="mt-4">
-            <label for="transaction-amount" class="block text-gray-600 text-sm">
+            <label for="tinstallment-amount" class="block text-gray-600 text-sm">
               {{
-                store.dir === "rtl" ? "مقدار پرداختی" : "Transaction Amount"
+                store.dir === "rtl" ? "مقدار قسط" : "Installment"
               }}
             </label>
             <input
               type="number"
-              id="transaction-amount"
-              v-model="form.amount"
+              id="installment-amount"
+              v-model="form.portion"
+              class="focus:ring-indigo-500 px-4 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
+            />
+          </div>
+          <div id="name" class="mt-4">
+            <label for="total-amount" class="block text-gray-600 text-sm">
+              {{
+                store.dir === "rtl" ? "مقدار کلی وام" : "Loan Total Amount"
+              }}
+            </label>
+            <input
+              type="number"
+              id="total-amount"
+              v-model="form.total_amount"
+              class="focus:ring-indigo-500 px-4 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
+            />
+          </div>
+          <div id="amount" class="mt-4">
+            <label for="month-day" class="block text-gray-600 text-sm">
+              {{
+                store.dir === "rtl" ? "زمان پرداختی ماهانه" : "Monthly Due Day"
+              }}
+            </label>
+            <input
+              type="text"
+              dir="auto"
+              id="month-day"
+              v-model="form.month_day"
               class="focus:ring-indigo-500 px-4 focus:border-indigo-500 block w-full shadow-inner sm:text-sm border-gray-300 rounded-md bg-gray-100 py-2 text-gray-600"
             />
           </div>
@@ -68,7 +79,7 @@
         :class="store.dir === 'ltr' ? 'sm:flex-row-reverse' : 'sm:flex-row'"
       >
         <button
-          @click="insertTransaction"
+          @click="insertLoan"
           type="button"
           class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
         >
@@ -93,41 +104,29 @@
 import { reactive, ref } from "vue";
 import { store } from "../store";
 import { onClickOutside, useFocus } from "@vueuse/core";
-import { AlertType, Loan, Transaction } from "../helpers/interfaces";
-import { addTransaction, updateTransaction } from "../vuetils/useTransactions";
+import { addLoan, allLoans, computeRemainder, updateLoan } from "../vuetils/useLoans";
+import { AlertType, Loan } from "../helpers/interfaces";
 import ModalContainer from "./ModalContainer.vue";
 
-const input = ref();
 const isAlertShown = ref(false);
 const alertMessage = ref('');
 const alertType = ref<AlertType>("error");
 
-useFocus({ target: input, initialValue: true });
+const input = ref();
 
+useFocus({ target: input, initialValue: true });
 const target = ref(null);
 
-onClickOutside(target, (event) => closeHandler());
+onClickOutside(target, () => closeHandler());
 
 const closeHandler = () => emit("onClose");
 
-const emit = defineEmits<{ (e: "onClose", transaction?: Transaction): void }>();
+const emit = defineEmits<{ (e: "onClose"): void }>();
 
-const props = defineProps<{
-  isShown: boolean;
-  loan: Loan;
-  content: Transaction;
-}>();
-
-const form = reactive<Transaction>({
-  loan_id: "",
-  name: props.content.name,
-  amount: props.loan?.portion,
-});
-
-async function insertTransaction() {
+async function insertLoan() {
   // Guard for short task descriptions which will fail db policy.
   if (form.name.length <= 3) {
-    alertMessage.value = store.dir === 'rtl' ? 'عنوان خیلی کوچیکه!' : "Please make your transaction a little more descriptive";
+    alertMessage.value = store.dir === 'rtl' ? 'عنوان وام خیلی کوچیکه!' : "Please make your loan a little more descriptive";
     alertType.value = 'error';
     isAlertShown.value = true;
     return;
@@ -139,38 +138,63 @@ async function insertTransaction() {
     isAlertShown.value = true;
     return;
   }
-  if(!form.amount || form.amount === 0) {
-    alertMessage.value = store.dir === 'rtl' ? 'مقدار پرداختی وارد نشده' : "Please enter a valid value for transaction amount";
+  if(!form.month_day || !form.portion || !form.total_amount || form.total_amount === 0 || form.portion === 0) {
+    alertMessage.value = store.dir === 'rtl' ? 'مقادیر صحیح نمی‌باشد' : "Please enter valid inputs";
     alertType.value = 'error';
     isAlertShown.value = true;
     return;
   }
   try {
     // Try and write the data to the database.
-    const {data: transaction, error} = await updateTransaction({
-      loan_id: props.loan.id as string,
+    let { error, data: loan } = await updateLoan({
+      user_id: store.userSession.user!.id,
       name: form.name,
-      amount: form.amount,
-      user_id: store.user?.id,
+      month_day: form.month_day,
+      total_amount: form.total_amount,
+      portion: form.portion,
       id: props.content.id
     });
 
-    // If there was no response, don't do anything.
-    if (!transaction) {
-      alertMessage.value = error?.message!;
+    if (error) {
+      alertMessage.value = error.message;
       alertType.value = 'error';
       isAlertShown.value = true;
+    }
+    // If there was no response, don't do anything.
+    if (!loan) {
       return;
     }
+    loan.remainder = props.content.remainder;
+    loan.transactions = props.content.transactions;
     // Otherwise, push the response into allTodos.
-    transaction.created_at = new Date(
-      transaction.created_at as string
-    ).toLocaleString();
-    emit("onClose", transaction);
+    allLoans.value.splice(props.loanIndex, 1, loan);
+    emit("onClose");
 
     // Reset input field.
+    form.name = '';
+    form.month_day = '';
+    form.portion = 0;
+    form.total_amount = 0;
   } catch (err) {
-    console.error("Unknown error when adding todo", err);
+    console.error("Unknown error when adding loan", err);
   }
 }
+
+const props = defineProps<{
+  isShown: boolean;
+  content: Loan;
+  loanIndex: number;
+}>();
+
+const form = reactive<{
+  name: string;
+  portion: number;
+  total_amount: number;
+  month_day: string;
+}>({
+  portion: props.content.portion,
+  name: props.content.name,
+  total_amount: props.content.total_amount,
+  month_day: props.content.month_day,
+});
 </script>

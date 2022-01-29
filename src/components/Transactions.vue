@@ -50,9 +50,13 @@
                   class="px-6 py-4 whitespace-nowrap text-sm font-medium flex flex-row-reverse items-center"
                 >
                   <a
+                    @click="onClickDelete(row, index)"
+                    class="cursor-pointer text-red-600 py-1 px-2 hover:(text-red-900 bg-red-100 rounded)"
+                  >{{ store.dir === "rtl" ? "حذف" : "Delete" }}</a>
+                  <a
                     id="edit-button"
-                    @click="prepareEdit(row, index)"
-                    class="cursor-pointer text-gray-600 mx-1 px-2 py-1 hover:(text-gray-700 bg-gray-200 rounded)"
+                    @click="onClickEdit(row, index)"
+                    class="cursor-pointer text-indigo-600 mx-1 px-2 py-1 hover:(text-gray-700 bg-gray-200 rounded)"
                   >
                     <svg
                       width="24"
@@ -74,10 +78,6 @@
                       />
                     </svg>
                   </a>
-                  <a
-                    @click="onClickDelete(row, index)"
-                    class="cursor-pointer text-red-600 py-1 px-2 hover:(text-red-900 bg-red-100 rounded)"
-                  >{{ store.dir === "rtl" ? "حذف" : "Delete" }}</a>
                 </td>
               </tr>
               <tr v-if="!props.rows.length">
@@ -117,10 +117,10 @@ const onClickDelete = (transaction: Transaction, index: number) => {
   isModalShown.value = true;
 }
 
-const emits = defineEmits<(e: 'emitEditContent', transaction: Transaction, index: number)>();
+const emits = defineEmits<{ (e: 'edit', transaction: Transaction, index: number): void }>();
 
-const prepareEdit = (transaction: Transaction, index: number) => {
-  emits('emitEditContent', transaction, index);
+const onClickEdit = (transaction: Transaction, index: number) => {
+  emits('edit', transaction, index);
 }
 
 const onClickCancel = () => {

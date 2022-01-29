@@ -99,6 +99,43 @@ async function addLoan(
   }
 }
 
+async function updateLoan(
+  loan: Loan
+): Promise<
+  { error: PostgrestError; data: null } | { data: Loan; error: null }
+> {
+  store.loading = true;
+  try {
+    const { data, error } = await supabase
+      .from("loans")
+      .update({...loan})
+      .eq("id", loan.id)
+      .single();
+
+    if (error) {
+      store.loading = false;
+      console.error("There was an error updating the loan", error);
+      return { error, data: null };
+    }
+
+    console.log("updated the loan with id", data.id);
+    store.loading = false;
+    return { data, error: null };
+  } catch (err) {
+    store.loading = false;
+    console.error("Unknown problem updating", err);
+    return {
+      error: {
+        message: store.dir === "rtl" ? "خطا" : "Error",
+        details: "",
+        hint: "",
+        code: "",
+      },
+      data: null,
+    };
+  }
+}
+
 /**
  * Targets a specific todo via its record id and updates the is_completed attribute.
  */
@@ -152,6 +189,7 @@ export {
   allLoans,
   fetchLoans,
   addLoan,
+  updateLoan,
   updatePaymentCompletion,
   deleteLoan,
   computeRemainder,

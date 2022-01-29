@@ -7,6 +7,8 @@ import AddTransaction from "./AddTransaction.vue";
 import AddLoan from "./AddLoan.vue";
 import { allLoans, computeRemainder, deleteLoan, fetchLoans } from "../vuetils/useLoans";
 import { Loan, Transaction } from "../helpers/interfaces";
+import EditTransaction from "./EditTransaction.vue";
+import EditLoan from "./EditLoan.vue";
 
 const showAddTransaction = ref(false);
 const showEditTransaction = ref(false);
@@ -33,16 +35,29 @@ watch(
   }
 );
 const title = ref(defaultTitle[store.dir]);
-const isEdit = ref(false);
 const editTransactionContent = ref<Transaction>();
 const editableTransactionIndex = ref<number>();
 
-const onEditTransaction = (transaction: Transaction, index: number) => {
-  isEdit.value = true;
+const editLoanContent = ref<Loan>();
+const editableLoanIndex = ref<number>();
+
+const showEditLoan = ref(false);
+
+const editTransactionHandler = (transaction: Transaction, index: number) => {
   editTransactionContent.value = transaction;
   editableTransactionIndex.value = index;
   showEditTransactionHandler();
 }
+
+const editLoanHandler = (loan: Loan, index: number) => {
+  editLoanContent.value = loan;
+  editableLoanIndex.value = index;
+  showEditLoanHandler();
+}
+
+const showEditLoanHandler = () => {
+  showEditLoan.value = true;
+};
 
 const showAddTransactionHandler = () => {
   showAddTransaction.value = true;
@@ -73,7 +88,16 @@ const modalCloseHandler = (transaction?: Transaction) => {
   }
   showAddTransaction.value = false;
   showAddLoan.value = false;
+  showEditLoan.value = false;
 };
+
+const editTransactionModalCloseHandler = (transaction?: Transaction) => {
+  if (transaction) {
+    selectedLoan.value?.transactions?.splice(editableTransactionIndex.value!, 1, transaction);
+    selectedLoan.value = computeRemainder(selectedLoan.value as Loan);
+  }
+  showEditTransaction.value = false;
+}
 
 const detailsHandler = (id: string) => {
   const loan = rows.value.find((row) => row.id === id);
@@ -98,10 +122,28 @@ onMounted(async () => await fetchLoans());
 <template>
   <div class="max-w-4xl pt-28 flex flex-col mx-4 lg:mx-auto">
     <Teleport to="body">
+      <EditTransaction
+        :loan="selectedLoan!"
+        :is-shown="showEditTransaction"
+        v-if="showEditTransaction"
+        :content="editTransactionContent!"
+        @onClose="editTransactionModalCloseHandler"
+      />
+    </Teleport>
+    <Teleport to="body">
       <AddTransaction
         :loan="selectedLoan!"
         :is-shown="showAddTransaction"
         v-if="showAddTransaction"
+        @onClose="modalCloseHandler"
+      />
+    </Teleport>
+    <Teleport to="body">
+      <EditLoan
+        v-if="showEditLoan"
+        :is-shown="showEditLoan"
+        :content="editLoanContent!"
+        :loan-index="editableLoanIndex!"
         @onClose="modalCloseHandler"
       />
     </Teleport>
@@ -115,10 +157,15 @@ onMounted(async () => await fetchLoans());
         @click="showAddLoanHandler"
       >
         {{ store.dir === "rtl" ? "وام جدید" : "New Loan" }}
-        <svg width="20" height="20" fill="currentColor" class="mr-2">
+        <svg
+          width="20"
+          height="20"
+          fill="currentColor"
+          class="mr-2"
+        >
           <path
             d="M10 5a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3H6a1 1 0 1 1 0-2h3V6a1 1 0 0 1 1-1Z"
-          ></path>
+          />
         </svg>
       </div>
       <div
@@ -127,10 +174,15 @@ onMounted(async () => await fetchLoans());
         @click="showAddTransactionHandler"
       >
         {{ store.dir === "rtl" ? "تراکنش جدید" : "New Transaction" }}
-        <svg width="20" height="20" fill="currentColor" class="mr-2">
+        <svg
+          width="20"
+          height="20"
+          fill="currentColor"
+          class="mr-2"
+        >
           <path
             d="M10 5a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3H6a1 1 0 1 1 0-2h3V6a1 1 0 0 1 1-1Z"
-          ></path>
+          />
         </svg>
       </div>
       <button
@@ -138,23 +190,22 @@ onMounted(async () => await fetchLoans());
         @click="backHandler"
         class="bg-red-200 text-red-600 text-sm font-medium rounded px-4 py-2 mb-4 hover:(bg-red-300 text-red-700)"
         type="button"
-      >
-        {{ store.dir === "rtl" ? "بازگشت" : "Back" }}
-      </button>
+      >{{ store.dir === "rtl" ? "بازگشت" : "Back" }}</button>
     </div>
-    <div class="text-xl py-2 mb-2 text-gray-600 dark:text-white font-semibold font-poppins">
-      {{ title }}
-    </div>
+    <div
+      class="text-xl py-2 mb-2 text-gray-600 dark:text-white font-semibold font-poppins"
+    >{{ title }}</div>
     <Transactions
       v-if="showTransaction"
       :rows="transactionRows"
       :delete-transaction-handler="deleteTransactionHandler"
+      @edit="editTransactionHandler"
     />
     <Table
       v-else
       :rows="rows"
       :headers="headers"
-      class
+      @emit-edit-loan="editLoanHandler"
       @emit-details="detailsHandler"
       @emit-delete-loan="deleteLoanHandler"
     />

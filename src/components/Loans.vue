@@ -9,6 +9,7 @@ import { allLoans, computeRemainder, deleteLoan, fetchLoans } from "../vuetils/u
 import { Loan, Transaction } from "../helpers/interfaces";
 
 const showAddTransaction = ref(false);
+const showEditTransaction = ref(false);
 const showAddLoan = ref(false);
 
 const defaultTitle = { rtl: "لیست وام ها", ltr: "Loans List" };
@@ -34,15 +35,21 @@ watch(
 const title = ref(defaultTitle[store.dir]);
 const isEdit = ref(false);
 const editTransactionContent = ref<Transaction>();
+const editableTransactionIndex = ref<number>();
 
 const onEditTransaction = (transaction: Transaction, index: number) => {
   isEdit.value = true;
   editTransactionContent.value = transaction;
-  showAddTransactionHandler();
+  editableTransactionIndex.value = index;
+  showEditTransactionHandler();
 }
 
 const showAddTransactionHandler = () => {
   showAddTransaction.value = true;
+};
+
+const showEditTransactionHandler = () => {
+  showEditTransaction.value = true;
 };
 
 const showAddLoanHandler = () => {
@@ -95,8 +102,6 @@ onMounted(async () => await fetchLoans());
         :loan="selectedLoan!"
         :is-shown="showAddTransaction"
         v-if="showAddTransaction"
-        :isContentEditable="isEdit"
-        :editContent="editTransactionContent!"
         @onClose="modalCloseHandler"
       />
     </Teleport>
@@ -144,7 +149,6 @@ onMounted(async () => await fetchLoans());
       v-if="showTransaction"
       :rows="transactionRows"
       :delete-transaction-handler="deleteTransactionHandler"
-      @emit-edit-content="onEditTransaction"
     />
     <Table
       v-else

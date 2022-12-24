@@ -7,23 +7,33 @@ import TheHeader from "./components/TheHeader.vue";
 import TheFooter from "./components/TheFooter.vue";
 import { supabase } from "./helpers/supabase";
 import Login from "./components/Login.vue";
+import { onMounted } from "vue";
 
-store.user = supabase.auth.user();
-supabase.auth.onAuthStateChange((_, session) => {
-  store.user = session!.user;
-  store.userSession = session;
-});
+onMounted(() => {
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      store.userSession = data.session;
+      store.user = data.session!.user;
+    } else {
+      store.userSession = null;
+      store.user = null;
+    }
+  })
+
+  supabase.auth.onAuthStateChange((_, _session) => {
+    store.userSession = _session;
+    store.user = _session!.user;
+  })
+})
 </script>
 
 <template>
   <div
     class="duration-500 transition-all dark:bg-gray-600 bg-gray-100 min-w-360px max-w-7xl min-h-screen mx-auto flex flex-col"
-    :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'"
-    :dir="store.dir"
-  >
+    :class="store.dir === 'rtl' ? 'font-vazir' : 'font-poppins'" :dir="store.dir">
     <div class="min-h-[calc(100vh-50px)]">
       <TheHeader />
-      <div v-if="store.user">
+      <div v-if="store.user?.id">
         <Loans class="mx-auto" />
       </div>
       <div v-else>

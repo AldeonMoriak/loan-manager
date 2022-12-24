@@ -21,6 +21,7 @@ async function addTransaction(
     const { data, error } = await supabase
       .from("transactions")
       .insert(transaction)
+      .select()
       .single();
 
     if (error) {
@@ -54,6 +55,7 @@ async function updateTransaction(
       .from("transactions")
       .update({ ...transaction })
       .eq("id", transaction.id)
+      .select()
       .single();
 
     if (error) {
@@ -64,7 +66,7 @@ async function updateTransaction(
     store.loading = false;
 
     console.log("Updated transaction", transaction.id);
-    return { data, error: null };
+    return { data: data!, error: null };
   } catch (err) {
     store.loading = false;
     console.error("Unknown problem updating record", err);

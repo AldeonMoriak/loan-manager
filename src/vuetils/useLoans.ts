@@ -74,7 +74,7 @@ async function addLoan(
 > {
   store.loading = true;
   try {
-    const { data, error } = await supabase.from("loans").insert(loan).single();
+    const { data, error } = await supabase.from("loans").insert(loan).select().single();
 
     if (error) {
       console.error("There was an error inserting", error);
@@ -83,7 +83,7 @@ async function addLoan(
 
     console.log("created a new loan");
     store.loading = false;
-    return { data, error: null };
+    return { data: data!, error: null };
   } catch (err) {
     store.loading = false;
     console.error("Unknown problem inserting to db", err);
@@ -110,6 +110,7 @@ async function updateLoan(
       .from("loans")
       .update({...loan})
       .eq("id", loan.id)
+      .select()
       .single();
 
     if (error) {
@@ -118,9 +119,8 @@ async function updateLoan(
       return { error, data: null };
     }
 
-    console.log("updated the loan with id", data.id);
     store.loading = false;
-    return { data, error: null };
+    return { data: data!, error: null };
   } catch (err) {
     store.loading = false;
     console.error("Unknown problem updating", err);

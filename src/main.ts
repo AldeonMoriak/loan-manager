@@ -8,11 +8,11 @@ import { Integrations } from "@sentry/tracing";
 
 const app = createApp(App);
 
-declare module "@vue/runtime-core" {
-  export interface ComponentCustomProperties {
-    $formatPrice: (value: number) => string;
-  }
-}
+// declare module "@vue/runtime-core" {
+//   export interface Record {
+//     $formatPrice: (value: number) => string;
+//   }
+// }
 
 app.config.globalProperties.$formatPrice = (value: number) => {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

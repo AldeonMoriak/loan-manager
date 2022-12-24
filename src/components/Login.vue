@@ -37,7 +37,6 @@
           id="email"
           :placeholder="store.dir === 'ltr' ? 'Your email' : 'ایمیل شما'"
           v-model="email"
-          @keyup.enter.stop="handleLogin"
         />
       </div>
     </div>
@@ -56,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ApiError, Session } from "@supabase/gotrue-js";
+import { AuthError, Session } from "@supabase/gotrue-js";
 import { useFocus } from "@vueuse/core";
 import { computed, ref } from "vue";
 import { AlertType } from "../helpers/interfaces";
@@ -74,7 +73,7 @@ const isButtonDisable = computed(() => {
 
 const input = ref();
 
-const {focused: inputFocus } = useFocus({target: input, initialValue: true});
+const {focused: inputFocus } = useFocus(input, {initialValue: true});
 
 const handleLogin = async () => {
   try {
@@ -88,7 +87,7 @@ const handleLogin = async () => {
       return
     }
     loading.value = true;
-    const { error } = await supabase.auth.signIn({ email: email.value });
+    const { error } = await supabase.auth.signInWithOtp({ email: email.value });
     if (error) throw error;
     alertMessage.value = store.dir === 'ltr' ? "Check your email for the login link!" : 'لینک به ایمیلتان فرستاده شد';
     // alertMessage.value = "ایمیلت رو چک کن!";
@@ -96,7 +95,7 @@ const handleLogin = async () => {
     isAlertShown.value = true;
   } catch (error) {
     alertMessage.value =
-      (error as any).error_description || (error as ApiError).message;
+      (error as any).error_description || (error as AuthError).message;
     alertType.value = "error";
     isAlertShown.value = true;
   } finally {

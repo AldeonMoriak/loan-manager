@@ -36,7 +36,7 @@
                         ) : row.created_at
                     }}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $formatPrice(row.amount) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatPrice(row.amount) }}</td>
                 <td :class="store.dir === 'rtl' ? 'text-left' : 'text-right'"
                   class="px-6 py-4 whitespace-nowrap text-sm font-medium flex flex-row-reverse items-center">
                   <a @click="onClickDelete(row, index)"
@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import { store } from "../store";
-import { reactive, ref, watch } from "vue";
+import { inject, reactive, ref, watch } from "vue";
 import { Loan, Transaction } from "../helpers/interfaces";
 import { deleteTransaction } from "../vuetils/useTransactions";
 import DeleteModal from "./DeleteModal.vue";
@@ -84,6 +84,7 @@ const defaultHeaders = {
   ltr: ["Transaction", "Date", "Amount"],
 };
 
+const formatPrice = inject('formatPrice') as (value: number) => string;
 const isModalShown = ref(false);
 let deleteCandidate = reactive<{ transaction?: Transaction, index?: number }>({})
 

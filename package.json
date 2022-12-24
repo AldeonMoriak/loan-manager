@@ -9,12 +9,13 @@
   "dependencies": {
     "@sentry/tracing": "^7.28.1",
     "@sentry/vue": "^7.28.1",
-    "@supabase/gotrue-js": "^2.6.1",
     "@supabase/supabase-js": "^2.2.0",
     "@vueuse/core": "^9.9.0",
     "vue": "^3.2.45"
   },
   "devDependencies": {
+    "@babel/types": "^7.20.7",
+    "@types/node": "^18.11.17",
     "@vitejs/plugin-vue": "^4.0.0",
     "typescript": "^4.8.0",
     "vite": "^4.0.3",

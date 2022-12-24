@@ -34,13 +34,13 @@
                   <div class="flex items-center">
                     <div>
                       <div class="text-sm font-medium text-gray-900">{{ row.name }}</div>
-                      <div class="text-sm text-gray-500">{{ $formatPrice(row.total_amount) }}</div>
+                      <div class="text-sm text-gray-500">{{ formatPrice(row.total_amount) }}</div>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">{{ row.month_day }}</div>
-                  <div class="text-sm text-gray-500">{{ $formatPrice(row.portion) }}</div>
+                  <div class="text-sm text-gray-500">{{ formatPrice(row.portion) }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span
@@ -67,7 +67,7 @@
                     <div>
                       <div
                         class="text-sm font-medium text-gray-900"
-                      >{{ $formatPrice(row.remainder as number) }}</div>
+                      >{{ formatPrice(row.remainder as number) }}</div>
                       <div
                         class="text-sm text-gray-500"
                       >{{ remainingTime(row.remainder as number, row.portion) }}</div>
@@ -136,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, inject, reactive, ref } from "vue";
 import { Loan } from "../helpers/interfaces";
 import { store } from "../store";
 import { deleteLoan } from "../vuetils/useLoans";
@@ -144,6 +144,7 @@ import DeleteModal from "./DeleteModal.vue";
 import { calculateRemainingTime } from "../helpers/remainingTimeCalculator";
 
 const props = defineProps<{ headers: string[]; rows: Loan[] }>();
+const formatPrice = inject('formatPrice') as (value: number) => string;
 const emits = defineEmits<{
   (e: "emitDetails", index: string): void;
   (e: "emitDeleteLoan", index: number): void;

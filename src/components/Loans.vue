@@ -72,8 +72,8 @@ const showAddLoanHandler = () => {
 };
 
 const defaultHeaders = {
-  rtl: ["وام", "موعد", "وضعیت", "مانده"],
-  ltr: ["Loan", "Monthly Due", "Status", "Remainder"],
+  rtl: ["وام", "موعد", "وضعیت", "مانده", "آخرین پرداختی"],
+  ltr: ["Loan", "Monthly Due", "Status", "Remainder", "Latest Due"],
 };
 
 const headers = ref(defaultHeaders[store.dir]);
@@ -83,7 +83,7 @@ let transactionRows = ref<Transaction[]>([]);
 
 const modalCloseHandler = (transaction?: Transaction) => {
   if (transaction) {
-    selectedLoan.value?.transactions?.push(transaction);
+    selectedLoan.value?.transactions?.unshift(transaction);
     selectedLoan.value = computeRemainder(selectedLoan.value as Loan);
   }
   showAddTransaction.value = false;

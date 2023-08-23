@@ -46,17 +46,17 @@
                   <span
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                     :class="
-                      row.is_complete
+                      row.remainder === 0
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-600'
                     "
                   >
                     {{
-                      row.is_complete && store.dir === "rtl"
+                      row.remainder === 0 && store.dir === "rtl"
                         ? "اتمام"
-                        : row.is_complete && store.dir === "ltr"
+                        : row.remainder === 0 && store.dir === "ltr"
                           ? "Done"
-                          : !row.is_complete && store.dir === "ltr"
+                          : row.remainder !== 0 && store.dir === "ltr"
                             ? "active"
                             : "فعال"
                     }}
@@ -71,6 +71,20 @@
                       <div
                         class="text-sm text-gray-500"
                       >{{ remainingTime(row.remainder as number, row.portion) }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div>
+                      <div
+                        class="text-sm font-medium text-gray-900"
+                      >{{ 
+                      row.transactions?.length ?
+                       store.dir === 'rtl' ?
+                        new Date(row.transactions[0].created_at!).toLocaleDateString(
+                          "fa-IR"
+                        ) : new Date(row.transactions[0].created_at as string).toLocaleDateString('en-US') : '' }}</div>
                     </div>
                   </div>
                 </td>

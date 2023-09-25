@@ -128,12 +128,12 @@
                 </td>
               </tr>
               <tr v-if="store.loading">
-                <td colspan="5" class="text-center">
+                <td colspan="6" class="text-center">
                   <div class="gg-spinner text-center mx-auto"></div>
                 </td>
               </tr>
               <tr v-else-if="!rows.length">
-                <td colspan="5" class="text-center h-10 font-light text-sm">
+                <td colspan="6" class="text-center h-10 font-light text-sm">
                   {{
                     store.dir === "rtl"
                       ? "داده ای موجود نیست"

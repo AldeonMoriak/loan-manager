@@ -114,7 +114,7 @@ async function editLoan() {
   try {
     // Try and write the data to the database.
     let { error, data: loan } = await updateLoan({
-      user_id: store.userSession.user!.id,
+      user_id: store.userSession!.user!.id,
       name: form.name.trim(),
       month_day: form.month_day.trim(),
       total_amount: form.total_amount,

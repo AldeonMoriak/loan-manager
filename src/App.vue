@@ -12,17 +12,17 @@ import { onMounted } from "vue";
 onMounted(() => {
   supabase.auth.getSession().then(({ data }) => {
     if (data.session) {
-      store.userSession = data.session;
-      store.user = data.session!.user;
+      store.userSession = data.session as any;
+      store.user = data.session!.user as any;
     } else {
-      store.userSession = null;
-      store.user = null;
+      store.userSession = undefined;
+      store.user = undefined;
     }
   })
 
   supabase.auth.onAuthStateChange((_, _session) => {
-    store.userSession = _session;
-    store.user = _session!.user;
+    store.userSession = _session as any;
+    store.user = _session!.user as any;
   })
 })
 </script>

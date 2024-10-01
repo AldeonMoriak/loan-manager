@@ -42,7 +42,7 @@
                     : 'bg-gray-100 dark:bg-blue-gray-100'
                 "
               >
-                <td class="px-6 py-4">
+                <td class="px-6 py-4 min-w-96">
                   <div class="flex items-center">
                     <div class="text-sm font-medium text-gray-900">
                       {{ row.name }}

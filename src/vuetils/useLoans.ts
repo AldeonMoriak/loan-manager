@@ -56,7 +56,6 @@ async function fetchLoans() {
 
     // store response to allTodos
     allLoans.value = loans;
-    console.log("got loans!", allLoans.value);
     store.loading = false;
   } catch (err) {
     store.loading = false;

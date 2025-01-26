@@ -14,7 +14,7 @@ import { PostgrestError } from "@supabase/supabase-js";
  * add a new transaction
  */
 async function addTransaction(
-  transaction: Transaction
+  transaction: Transaction,
 ): Promise<null | Transaction> {
   store.loading = true;
   try {
@@ -26,6 +26,7 @@ async function addTransaction(
 
     if (error) {
       alert(error.message);
+      store.loading = false;
       console.error("There was an error inserting", error);
       return null;
     }
@@ -45,7 +46,7 @@ async function addTransaction(
  * Targets a specific todo via its record id and updates the is_completed attribute.
  */
 async function updateTransaction(
-  transaction: Transaction
+  transaction: Transaction,
 ): Promise<
   { error: PostgrestError; data: null } | { data: Transaction; error: null }
 > {
@@ -86,7 +87,7 @@ async function updateTransaction(
  *  Deletes a todo via its id
  */
 async function deleteTransaction(
-  transaction: Transaction
+  transaction: Transaction,
 ): Promise<PostgrestError | undefined> {
   store.loading = true;
   try {

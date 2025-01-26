@@ -6,10 +6,14 @@ import Alert from "./components/Alert.vue";
 
 const app = createApp(App);
 
-const formatPrice = (value: number) => {
-  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const formatPrice = (v: number) => {
+  let value = v.toString();
+  if (value.includes(".")) {
+    value = v.toFixed(2);
+  }
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-app.provide('formatPrice', formatPrice)
+app.provide("formatPrice", formatPrice);
 
 app.component("Alert", Alert).mount("#app");
